@@ -2,7 +2,7 @@
 // PLEASE INSURE YOU HAVE SELECTED THE CORRECT BOARD IN BOARD MANAGER. FAILURE TO DO THIS WILL BRICK THE PRO MICRO.
 // PLEASE NOTE PRO MICROS AND PRO MINIS ARE 2 COMPLETELY DIFFERENT BOARDS.
 
-//#define  USINGMP3  // download the Library for the Dfplayer here - https://github.com/PowerBroker2/DFPlayerMini_Fast/archive/refs/heads/master.zip
+#define  USINGMP3  // download the Library for the Dfplayer here - https://github.com/PowerBroker2/DFPlayerMini_Fast/archive/refs/heads/master.zip
 #include <SPI.h>
 #include <PN532_SPI.h>
 #include "PN532.h"     // download the Library for the Pn532 here - https://github.com/adafruit/Adafruit-PN532/archive/refs/heads/master.zip

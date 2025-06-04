@@ -1,0 +1,8 @@
+{
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/test",
+        "${workspaceFolder}/test/mocks"
+    ]
+}
