@@ -124,8 +124,8 @@ jobs:
       run: |
         # Generate compilation database for native environment
         pio run -t compiledb -e native
-        # Move it to project root for clang-tidy
-        cp .pio/build/native/compile_commands.json .
+        # The file is already generated in the project root by PlatformIO
+        ls -la compile_commands.json
     
     - name: Run clang-tidy
       run: |
@@ -152,6 +152,9 @@ jobs:
     - name: Generate HTML report
       if: always()
       run: |
+        # Ensure directory exists
+        mkdir -p clang-tidy-results
+        
         # Create a simple HTML report
         cat > clang-tidy-results/report.html << 'EOF'
         <!DOCTYPE html>
