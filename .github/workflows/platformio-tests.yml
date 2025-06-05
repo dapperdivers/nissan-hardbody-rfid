@@ -59,14 +59,10 @@ jobs:
         name: coverage-report-html
         path: coverage-report/
         retention-days: 30
-        
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
       with:
-        file: ./coverage.info
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}       
     
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -76,3 +72,91 @@ jobs:
         path: |
           .pio/build/native/test/
           test/
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    
+    - name: Cache PlatformIO
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.platformio
+          .pio
+        key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
+        restore-keys: |
+          ${{ runner.os }}-pio-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install platformio
+        # Install clang-tidy
+        sudo apt-get update
+        sudo apt-get install -y clang-tidy
+    
+    - name: Generate compile_commands.json
+      run: |
+        # Generate compilation database for native environment
+        pio run -t compiledb -e native
+        # Move it to project root for clang-tidy
+        cp .pio/build/native/compile_commands.json .
+    
+    - name: Run clang-tidy
+      run: |
+        # Create results directory
+        mkdir -p clang-tidy-results
+        
+        # Run clang-tidy on all source files
+        find src include -name "*.cpp" -o -name "*.h" | \
+        xargs clang-tidy -p . --export-fixes=clang-tidy-results/fixes.yaml 2>&1 | \
+        tee clang-tidy-results/output.txt
+        
+        # Check if there were any warnings
+        if grep -q "warning:" clang-tidy-results/output.txt; then
+          echo "::warning::Clang-tidy found issues. See artifacts for details."
+        fi
+    
+    - name: Generate HTML report
+      if: always()
+      run: |
+        # Create a simple HTML report
+        cat > clang-tidy-results/report.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Clang-tidy Report</title>
+          <style>
+            body { font-family: monospace; margin: 20px; }
+            .warning { color: #856404; background-color: #fff3cd; padding: 5px; margin: 5px 0; }
+            .error { color: #721c24; background-color: #f8d7da; padding: 5px; margin: 5px 0; }
+            pre { background-color: #f5f5f5; padding: 10px; overflow-x: auto; }
+          </style>
+        </head>
+        <body>
+          <h1>Clang-tidy Analysis Report</h1>
+          <pre>
+        EOF
+        
+        cat clang-tidy-results/output.txt >> clang-tidy-results/report.html
+        
+        cat >> clang-tidy-results/report.html << 'EOF'
+          </pre>
+        </body>
+        </html>
+        EOF
+    
+    - name: Upload clang-tidy results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: clang-tidy-results
+        path: clang-tidy-results/
+        retention-days: 30
