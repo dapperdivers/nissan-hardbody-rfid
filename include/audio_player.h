@@ -13,6 +13,15 @@
     #endif
 #endif
 
+// JQ6500 Status constants
+#define MP3_STATUS_STOPPED  0
+#define MP3_STATUS_PLAYING  1
+#define MP3_STATUS_PAUSED   2
+
+// JQ6500 Source constants  
+#define MP3_SRC_BUILTIN    0
+#define MP3_SRC_SDCARD     1
+
 class AudioPlayer {
 public:
     AudioPlayer(uint8_t rx_pin = 0, uint8_t tx_pin = 1);  // ESP32-C3 Serial1 pins
@@ -21,6 +30,15 @@ public:
     void setVolume(uint8_t volume);
     void playTrack(uint8_t track);
     void reset();  // JQ6500 reset method
+    
+    // Status monitoring methods
+    uint8_t getStatus();
+    uint8_t getVolume();
+    uint16_t getCurrentPosition();  // Current position in seconds
+    
+    // Source control methods
+    void setSource(uint8_t source);
+    uint8_t getSource();  // Note: JQ6500 doesn't actually have a getSource command
     
     // Sound effect constants
     static constexpr uint8_t SOUND_STARTUP = 1;
@@ -35,6 +53,7 @@ private:
     uint8_t current_volume;
     uint8_t rx_pin;
     uint8_t tx_pin;
+    uint8_t current_source;  // Track source internally since JQ6500 doesn't provide getSource
 
 #ifdef USINGMP3
 // Mock state for unit testing

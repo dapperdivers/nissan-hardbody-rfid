@@ -1,6 +1,7 @@
 # 🚗 Nissan Hardbody RFID Access Control System
 
 [![PlatformIO CI](https://github.com/dapperdivers/nissan-hardbody-rfid/workflows/PlatformIO%20CI/badge.svg)](https://github.com/dapperdivers/nissan-hardbody-rfid/actions)
+[![codecov](https://codecov.io/gh/dapperdivers/nissan-hardbody-rfid/branch/main/graph/badge.svg)](https://codecov.io/gh/dapperdivers/nissan-hardbody-rfid)
 
 ![Simple Sexy AC System](Simple%20Sexy%20AC%20V2.png)
 

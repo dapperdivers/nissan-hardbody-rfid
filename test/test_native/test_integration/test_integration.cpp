@@ -2,11 +2,24 @@
 #include "mock_arduino.h"
 #include "test_helpers.h"
 
-// Integration test constants
-constexpr uint32_t DOOR_UNLOCK_DURATION = 10000;  // 10 seconds
-constexpr uint8_t DOOR_UNLOCK_RELAY = 0;  // Relay 1 (0-indexed)
+// Integration test constants for ESP32-C3 + JQ6500 hardware
+// These tests simulate the business logic of the RFID access control system
+constexpr uint32_t RELAY1_DURATION = 1000;   // 1 second for relay 1
+constexpr uint32_t RELAY2_DURATION = 1000;   // 1 second for relay 2
+constexpr uint8_t RELAY1_PIN = 0;  // Relay 1 (0-indexed)
+constexpr uint8_t RELAY2_PIN = 1;  // Relay 2 (0-indexed)
 constexpr uint8_t MAXIMUM_INVALID_ATTEMPTS = 13;
 const uint8_t invalidDelays[MAXIMUM_INVALID_ATTEMPTS] = {1, 3, 4, 5, 8, 12, 17, 23, 30, 38, 47, 57, 68};
+
+// ESP32-C3 GPIO mapping for relays (active LOW)
+// RELAY1 = GPIO9
+// RELAY2 = GPIO10
+// Track numbering for JQ6500 MP3 player:
+// Track 2 = SOUND_WAITING
+// Track 3 = SOUND_ACCEPTED
+// Track 4 = SOUND_DENIED_1
+// Track 5 = SOUND_DENIED_2
+// Track 6 = SOUND_DENIED_3
 
 void test_valid_card_flow(void) {
     // Simulate valid card scan
@@ -14,9 +27,11 @@ void test_valid_card_flow(void) {
     integrationFixture->state.lastPlayedTrack = 3;
     TEST_ASSERT_EQUAL(3, integrationFixture->state.lastPlayedTrack);
     
-    // Expected: Activate relay 1
+    // Expected: Sequential relay activation
+    // Step 1: Activate relay 1
     digitalWrite(9, LOW); // Relay 1 on pin 9, active LOW
     TEST_ASSERT_EQUAL(LOW, mock_pin_states[9]);
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]); // Relay 2 should be off
     integrationFixture->state.relayActive = true;
     integrationFixture->state.relayActivatedTime = millis();
     
@@ -24,22 +39,31 @@ void test_valid_card_flow(void) {
     integrationFixture->state.invalidAttempts = 0;
     TEST_ASSERT_EQUAL(0, integrationFixture->state.invalidAttempts);
     
-    // Advance time by 10 seconds
-    advanceMockTime(DOOR_UNLOCK_DURATION);
+    // Advance time by 1 second (relay 1 duration)
+    advanceMockTime(RELAY1_DURATION);
     
-    // Expected: Deactivate relay after 10 seconds
-    if (millis() - integrationFixture->state.relayActivatedTime >= DOOR_UNLOCK_DURATION) {
-        digitalWrite(9, HIGH); // Relay 1 off
-        integrationFixture->state.relayActive = false;
-    }
+    // Step 2: Relay 1 OFF, Relay 2 ON
+    digitalWrite(9, HIGH); // Relay 1 off
+    digitalWrite(10, LOW); // Relay 2 on
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
+    TEST_ASSERT_EQUAL(LOW, mock_pin_states[10]);
+    
+    // Advance time by 1 second (relay 2 duration)
+    advanceMockTime(RELAY2_DURATION);
+    
+    // Step 3: Relay 2 OFF - sequence complete
+    digitalWrite(10, HIGH); // Relay 2 off
+    integrationFixture->state.relayActive = false;
     
     TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]);
     TEST_ASSERT_FALSE(integrationFixture->state.relayActive);
 }
 
 void test_invalid_card_flow_first_attempt(void) {
-    // Ensure relay is off at the start (HIGH = off due to active LOW logic)
+    // Ensure relays are off at the start (HIGH = off due to active LOW logic)
     digitalWrite(9, HIGH);
+    digitalWrite(10, HIGH);
     
     // First invalid attempt
     integrationFixture->state.invalidAttempts = 0;
@@ -137,20 +161,69 @@ void test_waiting_sound_after_10_seconds(void) {
 }
 
 void test_relay_timing_accuracy(void) {
-    // Activate relay
+    // Test sequential relay activation timing
+    resetMockState();
+    
+    // Activate relay 1
     digitalWrite(9, LOW);
     millis_t startTime = millis();
     
-    // Advance time by exactly 10 seconds
-    advanceMockTime(DOOR_UNLOCK_DURATION);
+    // Advance time by 1 second
+    advanceMockTime(RELAY1_DURATION);
     
-    // Deactivate relay
+    // Switch to relay 2
     digitalWrite(9, HIGH);
+    digitalWrite(10, LOW);
+    millis_t relay1Duration = millis() - startTime;
+    
+    // Advance time by 1 second
+    advanceMockTime(RELAY2_DURATION);
+    
+    // Deactivate relay 2
+    digitalWrite(10, HIGH);
+    millis_t totalDuration = millis() - startTime;
     
     // Verify timing
-    millis_t duration = millis() - startTime;
-    TEST_ASSERT_EQUAL(DOOR_UNLOCK_DURATION, duration);
+    TEST_ASSERT_EQUAL(RELAY1_DURATION, relay1Duration);
+    TEST_ASSERT_EQUAL(RELAY1_DURATION + RELAY2_DURATION, totalDuration);
     
     // Verify state transitions
-    TEST_ASSERT_EQUAL(2, getPinTransitionCount(9)); // LOW then HIGH
+    TEST_ASSERT_EQUAL(2, getPinTransitionCount(9));  // LOW then HIGH
+    TEST_ASSERT_EQUAL(2, getPinTransitionCount(10)); // LOW then HIGH
+}
+
+void test_sequential_relay_activation(void) {
+    // Test the complete sequential relay activation pattern
+    resetMockState();
+    
+    // Initial state - both relays off
+    TEST_ASSERT_EQUAL(0, mock_pin_states[9]);
+    TEST_ASSERT_EQUAL(0, mock_pin_states[10]);
+    
+    // Step 1: Relay 1 ON
+    digitalWrite(9, LOW);
+    TEST_ASSERT_EQUAL(LOW, mock_pin_states[9]);
+    TEST_ASSERT_EQUAL(0, mock_pin_states[10]);  // Relay 2 unchanged
+    
+    advanceMockTime(RELAY1_DURATION);
+    
+    // Step 2: Relay 1 OFF, Relay 2 ON
+    digitalWrite(9, HIGH);
+    digitalWrite(10, LOW);
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
+    TEST_ASSERT_EQUAL(LOW, mock_pin_states[10]);
+    
+    advanceMockTime(RELAY2_DURATION);
+    
+    // Step 3: Relay 2 OFF
+    digitalWrite(10, HIGH);
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]);
+    
+    // Verify the complete sequence
+    const uint8_t expectedRelay1[] = {LOW, HIGH};
+    const uint8_t expectedRelay2[] = {LOW, HIGH};
+    
+    TEST_ASSERT_TRUE(verifyPinSequence(9, expectedRelay1, 2));
+    TEST_ASSERT_TRUE(verifyPinSequence(10, expectedRelay2, 2));
 }

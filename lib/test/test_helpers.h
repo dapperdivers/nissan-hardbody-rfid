@@ -66,7 +66,7 @@ public:
     RFIDController* rfid;
     
     RFIDTestFixture() {
-        resetMockState();
+        // Don't reset mock state here - it's already done in setUp()
         rfid = new RFIDController(10);
     }
     
@@ -83,5 +83,12 @@ extern RFIDTestFixture* rfidFixture;
 
 void setUp(void);
 void tearDown(void);
+
+// Integration test helper functions
+void advanceMockTime(millis_t ms);
+millis_t getTotalDelayTime(void);
+uint8_t getPinTransitionCount(uint8_t pin);
+void resetMockState();
+bool verifyPinSequence(uint8_t pin, const uint8_t* expectedStates, uint8_t stateCount);
 
 #endif // TEST_HELPERS_H

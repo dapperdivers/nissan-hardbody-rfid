@@ -1,16 +1,17 @@
 #include "audio_player.h"
 
-// Global HardwareSerial instance for ESP32-C3
-HardwareSerial MySerial(1); // Use Serial1
+// Create HardwareSerial instance for UART1 on ESP32-C3
+HardwareSerial AudioSerial(1);
 
 AudioPlayer::AudioPlayer(uint8_t rx_pin, uint8_t tx_pin)
     : initialized(false)
     , current_volume(20)
     , rx_pin(rx_pin)
     , tx_pin(tx_pin)
+    , current_source(MP3_SRC_BUILTIN)  // Default to built-in flash
 #ifdef USINGMP3
     , audio_enabled(false)
-    , serial(&MySerial)
+    , serial(&AudioSerial)
     , player(nullptr)
 #endif
 {
@@ -18,20 +19,20 @@ AudioPlayer::AudioPlayer(uint8_t rx_pin, uint8_t tx_pin)
 
 bool AudioPlayer::begin() {
 #ifdef USINGMP3
-    // ESP32-C3 with JQ6500
-    // Initialize Serial1 on specified pins
-    // Try without config parameter - use default
-    #ifdef ESP32
-        MySerial.begin(9600, SERIAL_8N1, rx_pin, tx_pin);
-    #else
-        MySerial.begin(9600);
-    #endif
+    // Initialize UART1 with JQ6500 communication parameters
+    AudioSerial.begin(9600, SERIAL_8N1, rx_pin, tx_pin);
     delay(500);
     
-    player = new JQ6500_Serial(MySerial);
+    // Create JQ6500 instance with our serial connection
+    player = new JQ6500_Serial(AudioSerial);
     
     reset();  // Reset JQ6500 on startup
     delay(500);
+    
+    // Ensure we're using built-in flash memory (not SD card)
+    setSource(MP3_SRC_BUILTIN);
+    delay(100);
+    
     player->setVolume(current_volume);
     
     audio_enabled = true;
@@ -76,4 +77,53 @@ void AudioPlayer::reset() {
         player->reset();
     }
 #endif
+}
+
+uint8_t AudioPlayer::getStatus() {
+#ifdef USINGMP3
+    if (!initialized || !audio_enabled) return MP3_STATUS_STOPPED;
+    
+    uint8_t status = player->getStatus();
+    return status;
+#else
+    return MP3_STATUS_STOPPED;
+#endif
+}
+
+uint8_t AudioPlayer::getVolume() {
+#ifdef USINGMP3
+    if (!initialized || !audio_enabled) return 0;
+    
+    // Return cached value as getVolume() from JQ6500 can be unreliable
+    return current_volume;
+#else
+    return 0;
+#endif
+}
+
+uint16_t AudioPlayer::getCurrentPosition() {
+#ifdef USINGMP3
+    if (!initialized || !audio_enabled) return 0;
+    
+    return player->currentFilePositionInSeconds();
+#else
+    return 0;
+#endif
+}
+
+void AudioPlayer::setSource(uint8_t source) {
+#ifdef USINGMP3
+    if (!initialized || !audio_enabled) return;
+    
+    // Only allow built-in flash or SD card sources
+    if (source == MP3_SRC_BUILTIN || source == MP3_SRC_SDCARD) {
+        current_source = source;
+        player->setSource(source);
+    }
+#endif
+}
+
+uint8_t AudioPlayer::getSource() {
+    // Return our cached source value since JQ6500 doesn't provide a getSource method
+    return current_source;
 }

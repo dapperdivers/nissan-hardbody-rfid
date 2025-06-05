@@ -66,3 +66,55 @@ void test_audio_reset(void) {
     // Reset method exists but we can't verify it was called without
     // adding tracking to the mock
 }
+
+void test_audio_status_monitoring(void) {
+    audioFixture->audio->begin();
+    
+    // Initial status should be stopped
+    TEST_ASSERT_EQUAL(MP3_STATUS_STOPPED, audioFixture->audio->getStatus());
+    
+    // Play a track and check status
+    audioFixture->audio->playTrack(AudioPlayer::SOUND_STARTUP);
+    TEST_ASSERT_EQUAL(MP3_STATUS_PLAYING, audioFixture->audio->getStatus());
+    
+    // Test volume getter
+    audioFixture->audio->setVolume(25);
+    TEST_ASSERT_EQUAL(25, audioFixture->audio->getVolume());
+    
+    // Test position (mock starts at 0)
+    TEST_ASSERT_EQUAL(0, audioFixture->audio->getCurrentPosition());
+    
+    // Simulate position change in mock
+    audioFixture->audio->player->setPosition(10);
+    TEST_ASSERT_EQUAL(10, audioFixture->audio->getCurrentPosition());
+}
+
+void test_audio_source_control(void) {
+    audioFixture->audio->begin();
+    
+    // Default source should be built-in flash
+    TEST_ASSERT_EQUAL(MP3_SRC_BUILTIN, audioFixture->audio->getSource());
+    
+    // Try to set to SD card source
+    audioFixture->audio->setSource(MP3_SRC_SDCARD);
+    TEST_ASSERT_EQUAL(MP3_SRC_SDCARD, audioFixture->audio->getSource());
+    
+    // Verify mock also has correct source
+    TEST_ASSERT_EQUAL(MP3_SRC_SDCARD, audioFixture->audio->player->getSource());
+    
+    // Set back to built-in
+    audioFixture->audio->setSource(MP3_SRC_BUILTIN);
+    TEST_ASSERT_EQUAL(MP3_SRC_BUILTIN, audioFixture->audio->getSource());
+    TEST_ASSERT_EQUAL(MP3_SRC_BUILTIN, audioFixture->audio->player->getSource());
+}
+
+void test_audio_source_ensures_builtin_on_init(void) {
+    // Create a new audio player
+    AudioPlayer testAudio;
+    
+    // Initialize it
+    TEST_ASSERT_TRUE(testAudio.begin());
+    
+    // Source should be set to built-in flash automatically
+    TEST_ASSERT_EQUAL(MP3_SRC_BUILTIN, testAudio.getSource());
+}

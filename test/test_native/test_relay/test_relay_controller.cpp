@@ -4,10 +4,10 @@
 
 void test_relay_initial_state(void) {
     // Check pin modes are set to OUTPUT
-    TEST_ASSERT_EQUAL(LOW, mock_pin_modes[9]);  // Relay 1
-    TEST_ASSERT_EQUAL(LOW, mock_pin_modes[6]);  // Relay 2
-    TEST_ASSERT_EQUAL(LOW, mock_pin_modes[5]);  // Relay 3
-    TEST_ASSERT_EQUAL(LOW, mock_pin_modes[4]);  // Relay 4
+    TEST_ASSERT_EQUAL(OUTPUT, mock_pin_modes[9]);   // Relay 1
+    TEST_ASSERT_EQUAL(OUTPUT, mock_pin_modes[10]);  // Relay 2
+    TEST_ASSERT_EQUAL(OUTPUT, mock_pin_modes[20]);  // Relay 3
+    TEST_ASSERT_EQUAL(OUTPUT, mock_pin_modes[21]);  // Relay 4
     
     // Check initial states
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(0));
@@ -15,11 +15,11 @@ void test_relay_initial_state(void) {
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(2));
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(3));
     
-    // Check initial pin states (active LOW)
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[9]);  // Relay 1
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[6]);  // Relay 2
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[5]);  // Relay 3
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[4]);  // Relay 4
+    // Check initial pin states (active LOW, so HIGH = OFF)
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);   // Relay 1
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]);  // Relay 2
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[20]);  // Relay 3
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[21]);  // Relay 4
 }
 
 void test_set_single_relay(void) {
@@ -42,9 +42,9 @@ void test_set_all_relays(void) {
     
     // Check all pins are LOW (active LOW logic)
     TEST_ASSERT_EQUAL(LOW, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[6]);
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[5]);
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[4]);
+    TEST_ASSERT_EQUAL(LOW, mock_pin_states[10]);
+    TEST_ASSERT_EQUAL(LOW, mock_pin_states[20]);
+    TEST_ASSERT_EQUAL(LOW, mock_pin_states[21]);
     
     relayFixture->relays->setAllRelays(false);
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(0));
@@ -54,9 +54,9 @@ void test_set_all_relays(void) {
     
     // Check all pins are HIGH (active LOW logic)
     TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[6]);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[5]);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[4]);
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]);
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[20]);
+    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[21]);
 }
 
 void test_invalid_relay_number(void) {
@@ -87,6 +87,8 @@ void test_relay_state_transitions(void) {
 }
 
 void test_rapid_relay_switching(void) {
+    // Clear history to only count transitions from this test
+    resetPinHistory();
     
     // Rapidly switch relay on and off
     for(int i = 0; i < 5; i++) {
@@ -107,11 +109,11 @@ void test_sequential_relay_operations(void) {
     // Test sequential activation pattern with timing
     relayFixture->relays->setRelay(0, true);  // Pin 9 goes LOW at time 0
     advanceMockTime(100);
-    relayFixture->relays->setRelay(1, true);  // Pin 6 goes LOW at time 100
+    relayFixture->relays->setRelay(1, true);  // Pin 10 goes LOW at time 100
     advanceMockTime(100);
-    relayFixture->relays->setRelay(2, true);  // Pin 5 goes LOW at time 200
+    relayFixture->relays->setRelay(2, true);  // Pin 20 goes LOW at time 200
     advanceMockTime(100);
-    relayFixture->relays->setRelay(3, true);  // Pin 4 goes LOW at time 300
+    relayFixture->relays->setRelay(3, true);  // Pin 21 goes LOW at time 300
     
     TEST_ASSERT_TRUE(relayFixture->relays->getRelayState(0));
     TEST_ASSERT_TRUE(relayFixture->relays->getRelayState(1));
@@ -119,7 +121,7 @@ void test_sequential_relay_operations(void) {
     TEST_ASSERT_TRUE(relayFixture->relays->getRelayState(3));
     
     // Verify timing between first relay activation and last relay activation
-    // Pin 9 goes LOW at time 0, Pin 4 goes LOW at time 300
+    // Pin 9 goes LOW at time 0, Pin 21 goes LOW at time 300
     // So we check the time between pin 9 going LOW and current time
     TEST_ASSERT_EQUAL(300, millis());
 }
