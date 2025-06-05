@@ -1,7 +1,13 @@
+---
+title: LED Status Indicators
+parent: Feature Guides
+nav_order: 1
+---
+
 # Feature: LED Status Indicators
 
-**Complexity**: 🟢 Low  
-**Hardware Required**: ✅ None (uses onboard LED)  
+**Complexity**: 🟢 Low
+**Hardware Required**: ✅ None (uses onboard LED)
 **User Value**: ⭐⭐⭐ Essential
 
 ## Overview

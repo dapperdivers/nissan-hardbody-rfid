@@ -1,0 +1,43 @@
+# Site settings
+title: Nissan Hardbody RFID Documentation
+description: >-
+  Modern, modular RFID keyless entry system for the Nissan Hardbody truck
+baseurl: "/simple-sexy"
+url: "https://dapperdivers.github.io"
+
+# Theme
+theme: just-the-docs
+color_scheme: light
+
+# Enable search
+search_enabled: true
+search_tokenizer_separator: /[\s/]+/
+
+# Footer content
+footer_content: "Copyright &copy; 2025 DapperDivers. MIT License."
+
+# External links
+aux_links:
+  "GitHub Repository":
+    - "//github.com/dapperdivers/simple-sexy"
+    
+# Navigation structure
+nav_order_separator: 1000
+
+# Collections for better organization
+collections:
+  features:
+    permalink: "/:collection/:path/"
+    output: true
+  development:
+    permalink: "/:collection/:path/"
+    output: true
+
+just_the_docs:
+  collections:
+    features:
+      name: Feature Guides
+      nav_order: 4
+    development:
+      name: Development
+      nav_order: 5
