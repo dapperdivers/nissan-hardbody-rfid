@@ -13,8 +13,12 @@ AudioPlayer audio;
 // Constants
 constexpr uint8_t MAXIMUM_INVALID_ATTEMPTS = 13;
 const uint8_t invalidDelays[MAXIMUM_INVALID_ATTEMPTS] = {1, 3, 4, 5, 8, 12, 17, 23, 30, 38, 47, 57, 68};
-constexpr uint32_t DOOR_UNLOCK_DURATION = 10000;  // 10 seconds
-constexpr uint8_t DOOR_UNLOCK_RELAY = 0;  // Relay 1 (0-indexed)
+
+// ESP32-C3 specific configuration
+constexpr uint32_t RELAY1_DURATION = 1000;   // 1 second for relay 1
+constexpr uint32_t RELAY2_DURATION = 1000;   // 1 second for relay 2
+constexpr uint8_t RELAY1_PIN = 0;  // Relay 1 (0-indexed)
+constexpr uint8_t RELAY2_PIN = 1;  // Relay 2 (0-indexed)
 
 // State variables
 uint8_t invalidAttempts = 0;
@@ -23,9 +27,21 @@ bool impatient = false;
 unsigned long relayActivatedTime = 0;
 bool relayActive = false;
 
+// ESP32-C3 specific state for sequential relay activation
+enum RelayState {
+    RELAY_IDLE,
+    RELAY1_ACTIVE,
+    RELAY2_PENDING,
+    RELAY2_ACTIVE
+};
+RelayState currentRelayState = RELAY_IDLE;
+
 void setup() {
     Serial.begin(115200);
-    delay(1000);
+    
+    // ESP32-C3 might need additional time for USB CDC to initialize
+    delay(2000);
+    
     Serial.println(F("Starting up!"));
     
     // Initialize controllers
@@ -44,12 +60,49 @@ void setup() {
     relays.setAllRelays(false); // All relays off initially
     
     if (audio.begin()) {
-        audio.setVolume(10);
+        audio.setVolume(20);  // Adjusted to match manufacturer's default
         delay(500);
         audio.playTrack(AudioPlayer::SOUND_STARTUP);
     }
     
     Serial.println(F("Waiting for an ISO14443A card"));
+}
+
+void handleRelaySequence() {
+    // ESP32-C3 sequential relay activation as per manufacturer
+    switch (currentRelayState) {
+        case RELAY_IDLE:
+            // Nothing to do
+            break;
+            
+        case RELAY1_ACTIVE:
+            if (millis() - relayActivatedTime >= RELAY1_DURATION) {
+                relays.setRelay(RELAY1_PIN, false);
+                relays.setRelay(RELAY2_PIN, true);
+                relayActivatedTime = millis();
+                currentRelayState = RELAY2_ACTIVE;
+                Serial.println(F("Relay 1 OFF, Relay 2 ON"));
+            }
+            break;
+            
+        case RELAY2_ACTIVE:
+            if (millis() - relayActivatedTime >= RELAY2_DURATION) {
+                relays.setRelay(RELAY2_PIN, false);
+                currentRelayState = RELAY_IDLE;
+                relayActive = false;
+                Serial.println(F("Relay 2 OFF - Sequence complete"));
+            }
+            break;
+    }
+}
+
+void activateRelays() {
+    // ESP32-C3 sequential activation
+    relays.setRelay(RELAY1_PIN, true);
+    relayActivatedTime = millis();
+    currentRelayState = RELAY1_ACTIVE;
+    relayActive = true;
+    Serial.println(F("Starting relay sequence - Relay 1 ON"));
 }
 
 void loop() {
@@ -58,12 +111,8 @@ void loop() {
     uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
     uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
     
-    // Check if relay should be deactivated after 10 seconds
-    if (relayActive && (millis() - relayActivatedTime >= DOOR_UNLOCK_DURATION)) {
-        relays.setRelay(DOOR_UNLOCK_RELAY, false);
-        relayActive = false;
-        Serial.println(F("Door locked"));
-    }
+    // Handle relay timing
+    handleRelaySequence();
     
     // Check if we should play the waiting sound
     if (millis() > 10000 && !impatient && !scanned) {
@@ -98,11 +147,8 @@ void loop() {
             invalidAttempts = 0; // RESETS THE DOUBLE DOWN DELAY
             audio.playTrack(AudioPlayer::SOUND_ACCEPTED);
             
-            // Activate relay 1 for 10 seconds to unlock door
-            relays.setRelay(DOOR_UNLOCK_RELAY, true);
-            relayActivatedTime = millis();
-            relayActive = true;
-            Serial.println(F("Door unlocked for 10 seconds"));
+            // Activate relays based on platform
+            activateRelays();
             
         } else {
             Serial.print(F("Unauthorised card"));

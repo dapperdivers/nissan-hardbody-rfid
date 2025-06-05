@@ -24,28 +24,28 @@ void test_audio_play_tracks(void) {
     
     // Test playing different tracks and verify with mock
     audioFixture->audio->playTrack(AudioPlayer::SOUND_STARTUP);
-    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_STARTUP, audioFixture->audio->player.getLastPlayedTrack());
+    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_STARTUP, audioFixture->audio->player->getLastPlayedTrack());
 
     audioFixture->audio->playTrack(AudioPlayer::SOUND_WAITING);
-    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_WAITING, audioFixture->audio->player.getLastPlayedTrack());
+    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_WAITING, audioFixture->audio->player->getLastPlayedTrack());
 
     audioFixture->audio->playTrack(AudioPlayer::SOUND_ACCEPTED);
-    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_ACCEPTED, audioFixture->audio->player.getLastPlayedTrack());
+    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_ACCEPTED, audioFixture->audio->player->getLastPlayedTrack());
 
     audioFixture->audio->playTrack(AudioPlayer::SOUND_DENIED_1);
-    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_DENIED_1, audioFixture->audio->player.getLastPlayedTrack());
+    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_DENIED_1, audioFixture->audio->player->getLastPlayedTrack());
 
     audioFixture->audio->playTrack(AudioPlayer::SOUND_DENIED_2);
-    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_DENIED_2, audioFixture->audio->player.getLastPlayedTrack());
+    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_DENIED_2, audioFixture->audio->player->getLastPlayedTrack());
 
     audioFixture->audio->playTrack(AudioPlayer::SOUND_DENIED_3);
-    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_DENIED_3, audioFixture->audio->player.getLastPlayedTrack());
+    TEST_ASSERT_EQUAL(AudioPlayer::SOUND_DENIED_3, audioFixture->audio->player->getLastPlayedTrack());
     
     // Test playing before initialization
     AudioPlayer uninitializedAudio;
     uninitializedAudio.playTrack(1); // Should not crash or interact with player
     // Add assertion here if possible to confirm no interaction,
-    // but mock_dfplayer doesn't currently support this.
+    // but mock_jq6500 doesn't currently support this.
 }
 
 void test_audio_track_constants(void) {
@@ -56,4 +56,13 @@ void test_audio_track_constants(void) {
     TEST_ASSERT_EQUAL(4, AudioPlayer::SOUND_DENIED_1);
     TEST_ASSERT_EQUAL(5, AudioPlayer::SOUND_DENIED_2);
     TEST_ASSERT_EQUAL(6, AudioPlayer::SOUND_DENIED_3);
+}
+
+void test_audio_reset(void) {
+    audioFixture->audio->begin();
+    
+    // Test reset functionality (JQ6500 specific)
+    audioFixture->audio->reset();
+    // Reset method exists but we can't verify it was called without
+    // adding tracking to the mock
 }
