@@ -1,5 +1,7 @@
 # 🚗 Nissan Hardbody RFID Access Control System
 
+[![PlatformIO CI](https://github.com/dapperdivers/nissan-hardbody-rfid/workflows/PlatformIO%20CI/badge.svg)](https://github.com/dapperdivers/nissan-hardbody-rfid/actions)
+
 ![Simple Sexy AC System](Simple%20Sexy%20AC.png)
 
 A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built on the SparkFun Pro Micro (3.3V, 8MHz) platform. This project takes the original SimpleSexyAC concept and transforms it into a robust, testable, and expandable access control system.
