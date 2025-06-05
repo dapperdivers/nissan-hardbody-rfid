@@ -39,7 +39,7 @@ void tearDown(void) {
 
 // Integration test helper functions
 void advanceMockTime(millis_t ms) {
-    mock_millis += ms;
+    mockMillis += ms;
 }
 
 millis_t getTotalDelayTime(void) {

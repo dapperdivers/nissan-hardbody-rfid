@@ -4,10 +4,10 @@
 
 void test_relay_initial_state(void) {
     // Check pin modes are set to OUTPUT
-    TEST_ASSERT_EQUAL(OUTPUT, mock_pin_modes[9]);   // Relay 1
-    TEST_ASSERT_EQUAL(OUTPUT, mock_pin_modes[10]);  // Relay 2
-    TEST_ASSERT_EQUAL(OUTPUT, mock_pin_modes[20]);  // Relay 3
-    TEST_ASSERT_EQUAL(OUTPUT, mock_pin_modes[21]);  // Relay 4
+    TEST_ASSERT_EQUAL(OUTPUT, mockPinModes[9]);   // Relay 1
+    TEST_ASSERT_EQUAL(OUTPUT, mockPinModes[10]);  // Relay 2
+    TEST_ASSERT_EQUAL(OUTPUT, mockPinModes[20]);  // Relay 3
+    TEST_ASSERT_EQUAL(OUTPUT, mockPinModes[21]);  // Relay 4
     
     // Check initial states
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(0));
@@ -16,21 +16,21 @@ void test_relay_initial_state(void) {
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(3));
     
     // Check initial pin states (active LOW, so HIGH = OFF)
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);   // Relay 1
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]);  // Relay 2
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[20]);  // Relay 3
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[21]);  // Relay 4
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[9]);   // Relay 1
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[10]);  // Relay 2
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[20]);  // Relay 3
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[21]);  // Relay 4
 }
 
 void test_set_single_relay(void) {
     relayFixture->relays->setRelay(0, true);
     TEST_ASSERT_TRUE(relayFixture->relays->getRelayState(0));
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(1));
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[9]);  // Active LOW logic
+    TEST_ASSERT_EQUAL(LOW, mockPinStates[9]);  // Active LOW logic
     
     relayFixture->relays->setRelay(0, false);
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(0));
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);  // Active LOW logic
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[9]);  // Active LOW logic
 }
 
 void test_set_all_relays(void) {
@@ -41,10 +41,10 @@ void test_set_all_relays(void) {
     TEST_ASSERT_TRUE(relayFixture->relays->getRelayState(3));
     
     // Check all pins are LOW (active LOW logic)
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[10]);
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[20]);
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[21]);
+    TEST_ASSERT_EQUAL(LOW, mockPinStates[9]);
+    TEST_ASSERT_EQUAL(LOW, mockPinStates[10]);
+    TEST_ASSERT_EQUAL(LOW, mockPinStates[20]);
+    TEST_ASSERT_EQUAL(LOW, mockPinStates[21]);
     
     relayFixture->relays->setAllRelays(false);
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(0));
@@ -53,10 +53,10 @@ void test_set_all_relays(void) {
     TEST_ASSERT_FALSE(relayFixture->relays->getRelayState(3));
     
     // Check all pins are HIGH (active LOW logic)
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[20]);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[21]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[9]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[10]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[20]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[21]);
 }
 
 void test_invalid_relay_number(void) {

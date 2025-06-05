@@ -1,48 +1,47 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #define PN532_MIFARE_ISO14443A (0x00)
 
 // Mock PN532 class
-class Adafruit_PN532 {
+class AdafruitPN532 {
 private:
-    uint8_t _ss_pin;
-    uint32_t _firmwareVersion;
-    bool _initialized;
+    uint8_t m_ss_pin;
+    uint32_t m_firmwareVersion{0x0153};
+    bool m_initialized{false};
     
     // Mock card data
-    uint8_t* _mockUID;
-    uint8_t _mockUIDLength;
-    bool _hasCard;
+    uint8_t* m_mockUID{nullptr};
+    uint8_t m_mockUIDLength{0};
+    bool m_hasCard{false};
     
 public:
-    Adafruit_PN532(uint8_t ss) : _ss_pin(ss), _firmwareVersion(0x0153), _initialized(false),
-                                _mockUID(nullptr), _mockUIDLength(0), _hasCard(false) {}
+    AdafruitPN532(uint8_t ss) : m_ss_pin(ss) {}
     
     void begin() {
-        _initialized = true;
+        m_initialized = true;
     }
     
-    uint32_t getFirmwareVersion() {
-        return _initialized ? _firmwareVersion : 0;
+    uint32_t getFirmwareVersion() const {
+        return m_initialized ? m_firmwareVersion : 0;
     }
     
-    void SAMConfig() {
+    void samConfig() {
         // Mock implementation - does nothing
     }
     
-    bool readPassiveTargetID(uint8_t cardbaudrate, uint8_t* uid, uint8_t* uidLength, uint16_t timeout = 0) {
-        if (!_initialized || !_hasCard) {
+    bool readPassiveTargetID(uint8_t  /*cardbaudrate*/, uint8_t* uid, uint8_t* uidLength, uint16_t  /*timeout*/ = 0) {
+        if (!m_initialized || !m_hasCard) {
             return false;
         }
         
-        if (_mockUID && uid && uidLength) {
+        if ((m_mockUID != nullptr) && (uid != nullptr) && (uidLength != nullptr)) {
             // Simple copy instead of memcpy
-            for (uint8_t i = 0; i < _mockUIDLength; i++) {
-                uid[i] = _mockUID[i];
+            for (uint8_t i = 0; i < m_mockUIDLength; i++) {
+                uid[i] = m_mockUID[i];
             }
-            *uidLength = _mockUIDLength;
+            *uidLength = m_mockUIDLength;
             return true;
         }
         
@@ -51,16 +50,16 @@ public:
     
     // Test helper methods
     void setMockCard(uint8_t* uid, uint8_t uidLength) {
-        _mockUID = uid;
-        _mockUIDLength = uidLength;
-        _hasCard = true;
+        m_mockUID = uid;
+        m_mockUIDLength = uidLength;
+        m_hasCard = true;
     }
     
     void removeMockCard() {
-        _hasCard = false;
+        m_hasCard = false;
     }
     
     void setFirmwareVersion(uint32_t version) {
-        _firmwareVersion = version;
+        m_firmwareVersion = version;
     }
 };

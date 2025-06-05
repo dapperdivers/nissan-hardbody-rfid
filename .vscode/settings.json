@@ -4,5 +4,8 @@
         "${workspaceFolder}/include",
         "${workspaceFolder}/test",
         "${workspaceFolder}/test/mocks"
-    ]
+    ],
+    "files.associations": {
+        "cstring": "cpp"
+    }
 }

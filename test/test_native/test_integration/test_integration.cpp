@@ -30,8 +30,8 @@ void test_valid_card_flow(void) {
     // Expected: Sequential relay activation
     // Step 1: Activate relay 1
     digitalWrite(9, LOW); // Relay 1 on pin 9, active LOW
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]); // Relay 2 should be off
+    TEST_ASSERT_EQUAL(LOW, mockPinStates[9]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[10]); // Relay 2 should be off
     integrationFixture->state.relayActive = true;
     integrationFixture->state.relayActivatedTime = millis();
     
@@ -45,8 +45,8 @@ void test_valid_card_flow(void) {
     // Step 2: Relay 1 OFF, Relay 2 ON
     digitalWrite(9, HIGH); // Relay 1 off
     digitalWrite(10, LOW); // Relay 2 on
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[10]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[9]);
+    TEST_ASSERT_EQUAL(LOW, mockPinStates[10]);
     
     // Advance time by 1 second (relay 2 duration)
     advanceMockTime(RELAY2_DURATION);
@@ -55,8 +55,8 @@ void test_valid_card_flow(void) {
     digitalWrite(10, HIGH); // Relay 2 off
     integrationFixture->state.relayActive = false;
     
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[9]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[10]);
     TEST_ASSERT_FALSE(integrationFixture->state.relayActive);
 }
 
@@ -82,7 +82,7 @@ void test_invalid_card_flow_first_attempt(void) {
     TEST_ASSERT_EQUAL(1, integrationFixture->state.invalidAttempts);
     
     // No relay activation
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]); // Relay should remain off
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[9]); // Relay should remain off
 }
 
 void test_invalid_card_flow_second_attempt(void) {
@@ -197,28 +197,28 @@ void test_sequential_relay_activation(void) {
     resetMockState();
     
     // Initial state - both relays off
-    TEST_ASSERT_EQUAL(0, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(0, mock_pin_states[10]);
+    TEST_ASSERT_EQUAL(0, mockPinStates[9]);
+    TEST_ASSERT_EQUAL(0, mockPinStates[10]);
     
     // Step 1: Relay 1 ON
     digitalWrite(9, LOW);
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(0, mock_pin_states[10]);  // Relay 2 unchanged
+    TEST_ASSERT_EQUAL(LOW, mockPinStates[9]);
+    TEST_ASSERT_EQUAL(0, mockPinStates[10]);  // Relay 2 unchanged
     
     advanceMockTime(RELAY1_DURATION);
     
     // Step 2: Relay 1 OFF, Relay 2 ON
     digitalWrite(9, HIGH);
     digitalWrite(10, LOW);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(LOW, mock_pin_states[10]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[9]);
+    TEST_ASSERT_EQUAL(LOW, mockPinStates[10]);
     
     advanceMockTime(RELAY2_DURATION);
     
     // Step 3: Relay 2 OFF
     digitalWrite(10, HIGH);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[9]);
-    TEST_ASSERT_EQUAL(HIGH, mock_pin_states[10]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[9]);
+    TEST_ASSERT_EQUAL(HIGH, mockPinStates[10]);
     
     // Verify the complete sequence
     const uint8_t expectedRelay1[] = {LOW, HIGH};

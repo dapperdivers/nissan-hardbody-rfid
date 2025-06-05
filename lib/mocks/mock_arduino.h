@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdint.h>
-#include <stddef.h>
-#include <stdio.h>
+#include <cstdint>
+#include <cstddef>
+#include <cstdio>
 
 // Mock Arduino types and constants
 #define HIGH 1
@@ -18,8 +18,8 @@
 #endif
 
 // Type definitions
-typedef unsigned long millis_t;
-typedef bool boolean;
+using millis_t = unsigned long;
+using boolean = bool;
 
 // Maximum number of state changes to track
 #define MAX_PIN_HISTORY 50
@@ -44,62 +44,62 @@ struct PinStateChange {
 // Mock HardwareSerial for unit testing (ESP32 pattern)
 class HardwareSerial {
 public:
-    HardwareSerial(int uart_nr = 0) : uart_nr_(uart_nr) {}
+    HardwareSerial(int uart_nr = 0) : m_uart_nr(uart_nr) {}
     
     // ESP32-style begin with config and pins
-    void begin(unsigned long baud, uint32_t config = SERIAL_8N1, int8_t rxPin = -1, int8_t txPin = -1) {
-        baud_rate_ = baud;
-        rx_pin_ = rxPin;
-        tx_pin_ = txPin;
+    void begin(unsigned long baud, uint32_t  /*config*/ = SERIAL_8N1, int8_t rxPin = -1, int8_t txPin = -1) {
+        m_baud_rate = baud;
+        m_rx_pin = rxPin;
+        m_tx_pin = txPin;
     }
     
     // Basic serial functions
-    void print(const char* str) { printf("[Serial print] %s", str); }
-    void print(const uint32_t val, int base = DEC) { 
+    static void print(const char* str) { printf("[Serial print] %s", str); }
+    static void print(const uint32_t VAL, int base = DEC) { 
         if (base == HEX) {
-            printf("[Serial print] 0x%x", val);
+            printf("[Serial print] 0x%x", VAL);
         } else {
-            printf("[Serial print] %u", val);
+            printf("[Serial print] %u", VAL);
         }
     }
-    void print(int val) { printf("[Serial print] %d", val); }
-    void println(const char* str) { printf("[Serial println] %s\n", str); }
-    void println(const uint32_t val, int base = DEC) { 
+    static void print(int val) { printf("[Serial print] %d", val); }
+    static void println(const char* str) { printf("[Serial println] %s\n", str); }
+    static void println(const uint32_t VAL, int base = DEC) { 
         if (base == HEX) {
-            printf("[Serial println] 0x%x\n", val);
+            printf("[Serial println] 0x%x\n", VAL);
         } else {
-            printf("[Serial println] %u\n", val);
+            printf("[Serial println] %u\n", VAL);
         }
     }
-    void println(int val) { printf("[Serial println] %d\n", val); }
-    void println() { printf("\n"); }
+    static void println(int val) { printf("[Serial println] %d\n", val); }
+    static void println() { printf("\n"); }
     
     // Additional serial functions
     void write(uint8_t data) { /* Mock write */ }
-    int available() { return 0; }
-    int read() { return -1; }
+    static int available() { return 0; }
+    static int read() { return -1; }
     
     // Getters for testing
-    unsigned long getBaudRate() const { return baud_rate_; }
-    int8_t getRxPin() const { return rx_pin_; }
-    int8_t getTxPin() const { return tx_pin_; }
+    unsigned long getBaudRate() const { return m_baud_rate; }
+    int8_t getRxPin() const { return m_rx_pin; }
+    int8_t getTxPin() const { return m_tx_pin; }
     
 private:
-    int uart_nr_;
-    unsigned long baud_rate_ = 0;
-    int8_t rx_pin_ = -1;
-    int8_t tx_pin_ = -1;
+    int m_uart_nr;
+    unsigned long m_baud_rate = 0;
+    int8_t m_rx_pin = -1;
+    int8_t m_tx_pin = -1;
 };
 
 // Global Serial object
-extern HardwareSerial Serial;
+extern HardwareSerial serial;
 
 // Mock state tracking
-extern uint8_t mock_pin_modes[MAX_PINS];
-extern uint8_t mock_pin_states[MAX_PINS];
-extern millis_t mock_millis;
-extern PinStateChange mock_pin_history[MAX_PIN_HISTORY];
-extern uint8_t mock_history_index;
+extern uint8_t mockPinModes[MAX_PINS];
+extern uint8_t mockPinStates[MAX_PINS];
+extern millis_t mockMillis;
+extern PinStateChange mockPinHistory[MAX_PIN_HISTORY];
+extern uint8_t mockHistoryIndex;
 
 // Mock Arduino functions
 void pinMode(uint8_t pin, uint8_t mode);

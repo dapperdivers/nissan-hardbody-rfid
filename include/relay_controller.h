@@ -23,7 +23,7 @@ private:
     };
     
     static constexpr uint8_t NUM_RELAYS = 4;
-    RelayPin relays[NUM_RELAYS];
+    RelayPin m_relays[NUM_RELAYS]{};
     
-    bool isValidRelay(uint8_t relay) const;
+    static bool isValidRelay(uint8_t relay) ;
 };

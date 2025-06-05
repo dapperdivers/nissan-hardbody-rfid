@@ -28,17 +28,17 @@ public:
     
     bool begin();
     void setVolume(uint8_t volume);
-    void playTrack(uint8_t track);
-    void reset();  // JQ6500 reset method
+    void playTrack(uint8_t track) const;
+    void reset() const;  // JQ6500 reset method
     
     // Status monitoring methods
-    uint8_t getStatus();
-    uint8_t getVolume();
-    uint16_t getCurrentPosition();  // Current position in seconds
+    uint8_t getStatus() const;
+    uint8_t getVolume() const;
+    uint16_t getCurrentPosition() const;  // Current position in seconds
     
     // Source control methods
     void setSource(uint8_t source);
-    uint8_t getSource();  // Note: JQ6500 doesn't actually have a getSource command
+    uint8_t getSource() const;  // Note: JQ6500 doesn't actually have a getSource command
     
     // Sound effect constants
     static constexpr uint8_t SOUND_STARTUP = 1;
@@ -49,18 +49,18 @@ public:
     static constexpr uint8_t SOUND_DENIED_3 = 6;
 
 private:
-    bool initialized;
-    uint8_t current_volume;
-    uint8_t rx_pin;
-    uint8_t tx_pin;
-    uint8_t current_source;  // Track source internally since JQ6500 doesn't provide getSource
+    bool m_initialized{false};
+    uint8_t m_current_volume{20};
+    uint8_t m_rx_pin;
+    uint8_t m_tx_pin;
+    uint8_t m_current_source{MP3_SRC_BUILTIN};  // Track source internally since JQ6500 doesn't provide getSource
 
 #ifdef USINGMP3
 // Mock state for unit testing
 public: 
-    bool audio_enabled;
+    bool audio_enabled{false};
     HardwareSerial* serial;
-    JQ6500_Serial* player;
+    JQ6500Serial* player{nullptr};
 private: // Keep private in production
 #endif
 };

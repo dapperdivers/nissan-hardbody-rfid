@@ -23,6 +23,6 @@ fi
 # Run clang-tidy
 echo "Running clang-tidy..."
 find src include -name "*.cpp" -o -name "*.h" | \
-xargs clang-tidy -p . --fix
+xargs clang-tidy -p . --fix-errors
 
 echo "Done! Check git diff for automatic fixes."

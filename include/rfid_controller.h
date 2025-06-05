@@ -24,14 +24,14 @@ public:
  private:
     static constexpr uint8_t MAX_4B_UIDS = 1;
     static constexpr uint8_t MAX_7B_UIDS = 2;
-    uint8_t _ss_pin;
-    Adafruit_PN532* nfc;  // Using SPI interface
+    uint8_t m_ss_pin;
+    AdafruitPN532* m_nfc;  // Using SPI interface
     
-    uint8_t uids4B[MAX_4B_UIDS][4];
-    uint8_t uids7B[MAX_7B_UIDS][7];
-    uint8_t num4BUIDs;
-    uint8_t num7BUIDs;
+    uint8_t m_uids4B[MAX_4B_UIDS][4]{};
+    uint8_t m_uids7B[MAX_7B_UIDS][7]{};
+    uint8_t m_num4BUIDs{0};
+    uint8_t m_num7BUIDs{0};
 
-    bool compare4BUID(const uint8_t* uid1, const uint8_t* uid2);
-    bool compare7BUID(const uint8_t* uid1, const uint8_t* uid2);
+    static bool compare4BUID(const uint8_t* uid1, const uint8_t* uid2);
+    static bool compare7BUID(const uint8_t* uid1, const uint8_t* uid2);
 };
