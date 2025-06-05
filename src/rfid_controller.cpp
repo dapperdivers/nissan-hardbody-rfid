@@ -1,11 +1,6 @@
 #include <cstring>
 #include "rfid_controller.h"
 
-#ifdef ARDUINO
-#include <Arduino.h>
-#else
-extern HardwareSerial Serial;
-#endif
 
 RFIDController::RFIDController(uint8_t ss_pin)
     : m_ss_pin(ss_pin)
