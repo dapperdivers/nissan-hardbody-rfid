@@ -43,7 +43,7 @@ jobs:
         pio test -e native --verbose
         # Generate coverage info
         lcov --capture --directory .pio/build/native/ --output-file coverage.info
-        lcov --remove coverage.info '/usr/*' '*/test/*' '*/lib/mocks/*' '*/.pio/*' --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' '*/test/*' '*/lib/mocks/*' '*/.pio/*' --output-file coverage.info --ignore-errors unused
         lcov --list coverage.info
     
     - name: Generate HTML coverage report
