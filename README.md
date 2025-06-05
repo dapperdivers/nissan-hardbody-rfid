@@ -7,12 +7,14 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 ## ✨ Key Features
 
 ### 🔐 **Secure Access Control**
+
 - RFID card reading with support for 4-byte and 7-byte UIDs
 - Brute-force protection with progressive delays (1-68 seconds)
 - 10-second door unlock on valid card presentation
 - Anti-passback protection through delay mechanism
 
-### 🔊 **Audio Feedback System**  
+### 🔊 **Audio Feedback System**
+
 - 6 different sound effects for various states
 - Power-up confirmation
 - "Are you still there?" prompt
@@ -20,6 +22,7 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 - Volume-controlled audio output
 
 ### 🏗️ **Modern Architecture**
+
 - **Modular OOP Design** - Clean separation of concerns
 - **Comprehensive Unit Testing** - Full test coverage with Unity framework
 - **Mock Objects** - Hardware abstraction for development
@@ -39,17 +42,20 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 ## 📚 Comprehensive Documentation
 
 ### Core Documentation
+
 - **[Project Overview](docs/PROJECT_OVERVIEW.md)** - Complete system architecture and capabilities
 - **[Hardware Guide](docs/HARDWARE_GUIDE.md)** - Detailed component specifications  
 - **[Current Features](docs/CURRENT_FEATURES.md)** - Implemented vs. possible features
 
 ### Feature Enhancement Guides
+
 - **[Feature Roadmap](docs/features/feature-roadmap.md)** - 14 enhancements with implementation timeline
 - **[Feature Documentation](docs/features/)** - Detailed guides for each enhancement
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - PlatformIO Core or IDE
 - SparkFun Pro Micro (3.3V, 8MHz) - **⚠️ NOT the 5V version!**
 - PN532 NFC/RFID module
@@ -59,22 +65,26 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/dapperdivers/nissan-hardbody-rfid.git
    cd nissan-hardbody-rfid
    ```
 
 2. Build the project:
+
    ```bash
    pio run
    ```
 
 3. Upload to your Pro Micro:
+
    ```bash
    pio run -t upload
    ```
 
 4. Run unit tests:
+
    ```bash
    pio test
    ```
@@ -91,22 +101,26 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 ## 📈 Improvement Roadmap
 
 ### 🎯 Phase 1: Zero-Cost Enhancements (1-2 weeks)
+
 1. **[LED Status Indicators](docs/features/01-led-status-indicators.md)** - Use built-in RX/TX LEDs
 2. **[Low Power Sleep Mode](docs/features/11-low-power-sleep-mode.md)** - 99% power reduction
 3. **[Master Card Programming](docs/features/06-master-card-programming.md)** - Add/remove cards without PC
 4. **[EEPROM Configuration](docs/features/12-dfplayer-sd-persistence.md)** - Persistent settings
 
 ### 🔒 Phase 2: Enhanced Security (1-2 weeks)
+
 5. **[Multiple Access Levels](docs/features/02-multiple-access-levels.md)** - Role-based permissions
 6. **[Access Logging](docs/features/05-access-logging.md)** - Track all entries
 7. **[Emergency Override](docs/features/08-emergency-override.md)** - Safety button
 
 ### ⚡ Phase 3: Hardware Additions (2-3 weeks)
+
 8. **[Time-Based Access](docs/features/03-time-based-access.md)** - Schedule restrictions
 9. **[Battery Backup](docs/features/09-battery-backup.md)** - Uninterrupted operation
 10. **[Dual Authentication](docs/features/07-dual-authentication.md)** - Two-factor security
 
 ### 📱 Phase 4: Advanced Features (3-4 weeks)
+
 11. **[Scheduled Relay Control](docs/features/14-scheduled-relay-control.md)** - Automated actions
 12. **[Remote Management](docs/features/04-remote-management.md)** - WiFi/Bluetooth control
 13. **[Mobile App Integration](docs/features/10-mobile-app-integration.md)** - Smartphone as key
@@ -114,7 +128,7 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 
 ## 🏗️ Project Structure
 
-```
+```txt
 nissan-hardbody-rfid/
 ├── docs/                    # Comprehensive documentation
 │   ├── features/           # 14 enhancement guides
@@ -151,7 +165,7 @@ Future versions will support EEPROM storage and master card programming.
 
 ## ⚡ Pin Connections
 
-```
+```txt
 Pro Micro 3.3V ←→ Component Connections
 ├── SPI Bus ←→ PN532 RFID Module
 │   ├── Pin 10 (SS)
@@ -184,7 +198,6 @@ pio test -v
 ## ⚠️ Important Warnings
 
 > **CRITICAL**: This project requires the **3.3V 8MHz Pro Micro**. Using a 5V version will damage the PN532 module!
-
 > **CAUTION**: Incorrect board selection in PlatformIO can brick the Pro Micro. Always verify settings before upload.
 
 ## 🤝 Contributing
@@ -205,11 +218,10 @@ MIT License - See [LICENSE](.github/LICENSE.md) for details
 
 ## 🙏 Acknowledgments
 
-- Original SimpleSexyAC concept
-- SparkFun for the Pro Micro documentation
-- Adafruit for the PN532 library
-- The PlatformIO community
+- Hardware created by **Chimpo**
+- Original software: [SIMPLE-SEXY](https://github.com/chiplocks/SIMPLE-SEXY)
+- RFID implants: [Dangerous Things](https://dangerousthings.com/)
 
 ---
 
-**Made with ❤️ for the Nissan Hardbody community**
+**Made with ❤️ for the Dangerous Things community**
