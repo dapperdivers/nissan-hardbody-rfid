@@ -21,7 +21,7 @@ class JQ6500Serial {
 public:
     JQ6500Serial(HardwareSerial& serial) 
         : m_serial(serial)
-         {}
+        {}
     
     void reset() {
         // Mock reset functionality

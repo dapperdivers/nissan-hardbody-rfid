@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <cstddef>
 #include <cstdio>
+#include <array>
 
 // Mock Arduino types and constants
 #define HIGH 1
@@ -95,10 +95,10 @@ private:
 extern HardwareSerial serial;
 
 // Mock state tracking
-extern uint8_t mockPinModes[MAX_PINS];
-extern uint8_t mockPinStates[MAX_PINS];
+extern std::array<uint8_t, MAX_PINS> mockPinModes;
+extern std::array<uint8_t, MAX_PINS> mockPinStates;
 extern millis_t mockMillis;
-extern PinStateChange mockPinHistory[MAX_PIN_HISTORY];
+extern std::array<PinStateChange, MAX_PIN_HISTORY> mockPinHistory;
 extern uint8_t mockHistoryIndex;
 
 // Mock Arduino functions

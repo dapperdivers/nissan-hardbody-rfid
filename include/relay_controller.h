@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #ifdef UNIT_TEST
     #include "mock_arduino.h"
 #else
@@ -23,7 +25,7 @@ private:
     };
     
     static constexpr uint8_t NUM_RELAYS = 4;
-    RelayPin m_relays[NUM_RELAYS]{};
+    std::array<RelayPin, NUM_RELAYS> m_relays{};
     
     static bool isValidRelay(uint8_t relay) ;
 };
