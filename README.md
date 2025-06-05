@@ -201,7 +201,7 @@ Please check the [Feature Roadmap](docs/features/feature-roadmap.md) for areas t
 
 ## 📄 License
 
-MIT License - See LICENSE file for details
+MIT License - See [LICENSE](.github/LICENSE.md) for details
 
 ## 🙏 Acknowledgments
 
