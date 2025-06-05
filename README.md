@@ -2,9 +2,9 @@
 
 [![PlatformIO CI](https://github.com/dapperdivers/nissan-hardbody-rfid/workflows/PlatformIO%20CI/badge.svg)](https://github.com/dapperdivers/nissan-hardbody-rfid/actions)
 
-![Simple Sexy AC System](Simple%20Sexy%20AC.png)
+![Simple Sexy AC System](Simple%20Sexy%20AC%20V2.png)
 
-A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built on the SparkFun Pro Micro (3.3V, 8MHz) platform. This project takes the original SimpleSexyAC concept and transforms it into a robust, testable, and expandable access control system.
+A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built on the ESP32-C3 SuperMini platform. This project takes the original SimpleSexyAC concept and transforms it into a robust, testable, and expandable access control system with WiFi and Bluetooth capabilities.
 
 ## ✨ Key Features
 
@@ -21,7 +21,14 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 - Power-up confirmation
 - "Are you still there?" prompt
 - Multiple access denied levels
-- Volume-controlled audio output
+- JQ6500 MP3 player module for reliable audio
+
+### 📡 **Wireless Connectivity**
+
+- WiFi 802.11 b/g/n for remote management
+- Bluetooth 5.0 (BLE) for mobile integration
+- OTA (Over-The-Air) update capability
+- Web-based configuration portal (future)
 
 ### 🏗️ **Modern Architecture**
 
@@ -36,10 +43,10 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 |--------|--------|---------|
 | **Core Functionality** | ✅ Complete | RFID reading, relay control, audio feedback |
 | **Code Quality** | ✅ Excellent | Modular OOP, unit tested, well-documented |
-| **Hardware Utilization** | ⚠️ 30% | Significant untapped potential |
+| **Hardware Utilization** | ⚠️ 20% | Significant untapped potential (WiFi/BLE unused) |
 | **Documentation** | ✅ Extensive | 14 feature guides + architecture docs |
-| **Power Efficiency** | ❌ Basic | Sleep modes not implemented |
-| **Configuration** | ❌ Hardcoded | EEPROM storage not utilized |
+| **Power Efficiency** | ❌ Basic | Deep sleep modes not implemented |
+| **Configuration** | ❌ Hardcoded | Flash storage not utilized |
 
 ## 📚 Comprehensive Documentation
 
@@ -59,10 +66,11 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 ### Prerequisites
 
 - PlatformIO Core or IDE
-- SparkFun Pro Micro (3.3V, 8MHz) - **⚠️ NOT the 5V version!**
+- ESP32-C3 SuperMini board
 - PN532 NFC/RFID module
-- 4-Channel relay module  
-- DFPlayer Mini + SD card (optional for audio)
+- 4-Channel relay module (SRD-05VDC-SL-C)
+- JQ6500 MP3 player module + speaker (optional for audio)
+- Mini360 DC-DC buck converter (12V to 5V)
 
 ### Installation
 
@@ -79,7 +87,7 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
    pio run
    ```
 
-3. Upload to your Pro Micro:
+3. Upload to your ESP32-C3:
 
    ```bash
    pio run -t upload
@@ -95,38 +103,41 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 
 | Component | Model | Current Use | Potential |
 |-----------|-------|-------------|-----------|
-| **Microcontroller** | SparkFun Pro Micro 3.3V/8MHz | Basic I/O | Sleep modes, EEPROM, USB HID |
+| **Microcontroller** | ESP32-C3 SuperMini | Basic I/O | WiFi, BLE, deep sleep (43μA) |
 | **RFID Reader** | PN532 NFC Module | Read UIDs only | Write cards, encryption, NFC |
-| **Relay Module** | 4-Channel 5V | 1 relay (door) | 3 unused channels |
-| **Audio Module** | DFPlayer Mini | 6 sound effects | Folders, equalizer, data storage |
+| **Relay Module** | 4-Channel SRD-05VDC | 1 relay (door) | 3 unused channels |
+| **Audio Module** | JQ6500 MP3 Player | 6 sound effects | Multiple folders, status |
+| **Power Supply** | Mini360 Buck Converter | 12V→5V conversion | 96% efficiency, protection |
 
 ## 📈 Improvement Roadmap
 
 ### 🎯 Phase 1: Zero-Cost Enhancements (1-2 weeks)
 
-1. **[LED Status Indicators](docs/features/01-led-status-indicators.md)** - Use built-in RX/TX LEDs
-2. **[Low Power Sleep Mode](docs/features/11-low-power-sleep-mode.md)** - 99% power reduction
+1. **[LED Status Indicators](docs/features/01-led-status-indicators.md)** - Use built-in blue LED
+2. **[Low Power Sleep Mode](docs/features/11-low-power-sleep-mode.md)** - 43μA deep sleep
 3. **[Master Card Programming](docs/features/06-master-card-programming.md)** - Add/remove cards without PC
-4. **[EEPROM Configuration](docs/features/12-dfplayer-sd-persistence.md)** - Persistent settings
+4. **[Flash Storage](docs/features/12-dfplayer-sd-persistence.md)** - Persistent settings in 4MB flash
 
-### 🔒 Phase 2: Enhanced Security (1-2 weeks)
+### 🔒 Phase 2: Wireless Features (1-2 weeks)
 
-5. **[Multiple Access Levels](docs/features/02-multiple-access-levels.md)** - Role-based permissions
-6. **[Access Logging](docs/features/05-access-logging.md)** - Track all entries
-7. **[Emergency Override](docs/features/08-emergency-override.md)** - Safety button
+5. **[WiFi Portal](docs/features/04-remote-management.md)** - Web-based configuration
+6. **[BLE Integration](docs/features/10-mobile-app-integration.md)** - Smartphone as key
+7. **[OTA Updates](docs/features/04-remote-management.md)** - Remote firmware updates
+8. **[MQTT Support](docs/features/04-remote-management.md)** - Home automation integration
 
-### ⚡ Phase 3: Hardware Additions (2-3 weeks)
+### ⚡ Phase 3: Enhanced Security (2-3 weeks)
 
-8. **[Time-Based Access](docs/features/03-time-based-access.md)** - Schedule restrictions
-9. **[Battery Backup](docs/features/09-battery-backup.md)** - Uninterrupted operation
-10. **[Dual Authentication](docs/features/07-dual-authentication.md)** - Two-factor security
+9. **[Multiple Access Levels](docs/features/02-multiple-access-levels.md)** - Role-based permissions
+10. **[Access Logging](docs/features/05-access-logging.md)** - Track all entries
+11. **[Time-Based Access](docs/features/03-time-based-access.md)** - Schedule restrictions
+12. **[Emergency Override](docs/features/08-emergency-override.md)** - Safety button
 
 ### 📱 Phase 4: Advanced Features (3-4 weeks)
 
-11. **[Scheduled Relay Control](docs/features/14-scheduled-relay-control.md)** - Automated actions
-12. **[Remote Management](docs/features/04-remote-management.md)** - WiFi/Bluetooth control
-13. **[Mobile App Integration](docs/features/10-mobile-app-integration.md)** - Smartphone as key
-14. **[Configurable Relay Modes](docs/features/13-configurable-relay-modes.md)** - Flexible outputs
+13. **[Battery Backup](docs/features/09-battery-backup.md)** - Uninterrupted operation
+14. **[Dual Authentication](docs/features/07-dual-authentication.md)** - Two-factor security
+15. **[Scheduled Relay Control](docs/features/14-scheduled-relay-control.md)** - Automated actions
+16. **[Configurable Relay Modes](docs/features/13-configurable-relay-modes.md)** - Flexible outputs
 
 ## 🏗️ Project Structure
 
@@ -163,23 +174,26 @@ void RFIDController::initializeDefaultUIDs() {
 }
 ```
 
-Future versions will support EEPROM storage and master card programming.
+Future versions will support flash storage and master card programming.
 
 ## ⚡ Pin Connections
 
 ```txt
-Pro Micro 3.3V ←→ Component Connections
+ESP32-C3 SuperMini ←→ Component Connections
 ├── SPI Bus ←→ PN532 RFID Module
 │   ├── Pin 10 (SS)
-│   └── ICSP Header (MOSI/MISO/SCK)
+│   └── MISO/MOSI/SCK pins
 ├── Digital Outputs ←→ 4-Channel Relay
 │   ├── Pin 9 → Relay 1 (Door Lock)
 │   ├── Pin 6 → Relay 2 (Available)
 │   ├── Pin 5 → Relay 3 (Available)
 │   └── Pin 4 → Relay 4 (Available)
-└── Serial ←→ DFPlayer Mini (Optional)
-    ├── Pin 8 → DFPlayer RX
-    └── Pin 7 → DFPlayer TX
+├── Serial ←→ JQ6500 MP3 Player (Optional)
+│   ├── Pin 1 → JQ6500 RX
+│   └── Pin 0 → JQ6500 TX
+└── Power ←→ Mini360 Buck Converter
+    ├── 5V → System power
+    └── GND → Common ground
 ```
 
 ## 🧪 Testing
@@ -199,18 +213,20 @@ pio test -v
 
 ## ⚠️ Important Warnings
 
-> **CRITICAL**: This project requires the **3.3V 8MHz Pro Micro**. Using a 5V version will damage the PN532 module!
-> **CAUTION**: Incorrect board selection in PlatformIO can brick the Pro Micro. Always verify settings before upload.
+> **IMPORTANT**: The ESP32-C3 operates at 3.3V logic levels. The system uses 5V power through the Mini360 converter for relay compatibility.
+
+> **CRITICAL**: Ensure proper voltage settings on the Mini360 buck converter (5V) before connecting to the system.
 
 ## 🤝 Contributing
 
 Contributions are welcome! Areas where help is especially appreciated:
 
-- Testing new feature implementations
+- Testing WiFi/BLE features
+- Web dashboard development
+- Mobile app development (iOS/Android)
 - PCB design for permanent installation
 - 3D printed enclosure designs
 - Security auditing
-- Mobile app development
 
 Please check the [Feature Roadmap](docs/features/feature-roadmap.md) for areas to contribute.
 

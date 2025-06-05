@@ -4,18 +4,21 @@ This document provides detailed information about each hardware component used i
 
 ## Core Components
 
-### 1. SparkFun Pro Micro (3.3V, 8MHz)
+### 1. ESP32-C3 SuperMini
 
 **Specifications:**
-- Microcontroller: ATmega32U4
-- Operating Voltage: 3.3V
-- Clock Speed: 8MHz
-- Flash Memory: 32KB (4KB used by bootloader)
-- SRAM: 2.5KB
-- EEPROM: 1KB
-- Digital I/O Pins: 18
-- PWM Channels: 7
-- Analog Inputs: 9 (A0-A3, A6-A10)
+- Microcontroller: ESP32-C3 (RISC-V)
+- Operating Voltage: 3.3V (with 5V input via USB-C)
+- Clock Speed: 160MHz
+- Flash Memory: 4MB
+- RAM: 400KB SRAM
+- ROM: 384KB
+- Digital I/O Pins: 11
+- PWM Channels: 11
+- Analog Inputs: 6 (A0-A5)
+- WiFi: 802.11 b/g/n (2.4 GHz)
+- Bluetooth: 5.0 (BLE)
+- Size: Ultra-compact 22.52 x 18mm
 
 **Current Usage:**
 - Pin 10: RFID SS (Slave Select)
@@ -23,23 +26,26 @@ This document provides detailed information about each hardware component used i
 - Pin 6: Relay 2
 - Pin 5: Relay 3
 - Pin 4: Relay 4
-- Pin 8: DFPlayer RX
-- Pin 7: DFPlayer TX / Wake interrupt
-- ICSP Header: SPI for RFID
+- Pin 1: JQ6500 TX (to JQ6500 RX)
+- Pin 0: JQ6500 RX (from JQ6500 TX)
+- MISO/MOSI/SCK: SPI for RFID
 
 **Available Features Not Yet Used:**
-- Pin 17 (RX LED) - Could be used for status indication
-- Pin 30 (TX LED) - Additional status LED
-- PWM pins - For LED brightness control or servo motors
-- Analog pins - For battery monitoring, light sensors
-- USB HID - Could act as keyboard/mouse for PC integration
-- External interrupts (Pin 0,1,2,3,7) - Pin 7 ready for wake-up
+- Pin 8 (Blue LED) - Status indication
+- WiFi capabilities for remote access
+- Bluetooth LE for mobile app integration
+- Deep sleep modes (43μA in deep sleep)
+- ADC pins for battery monitoring
+- PWM for LED brightness control
+- RTC peripheral for timekeeping
+- Touch sensor capabilities
 
 **Future Potential:**
-- Deep sleep modes for power saving
-- USB communication for configuration
-- I2C for additional sensors (SDA/SCL on pins 2/3)
-- Hardware serial for better communication
+- Over-the-air (OTA) updates
+- Web server for configuration
+- MQTT integration
+- BLE beacon functionality
+- ESP-NOW for mesh networking
 
 ### 2. PN532 NFC/RFID Module
 
@@ -72,16 +78,16 @@ This document provides detailed information about each hardware component used i
 - Clone card detection
 - Mobile phone NFC support
 
-### 3. DFPlayer Mini
+### 3. JQ6500 MP3 Player Module
 
 **Specifications:**
 - Operating Voltage: 3.2V-5V
-- Supported formats: MP3, WAV, WMA
-- Sampling rates: 8/11.025/12/16/22.05/24/32/44.1/48 kHz
-- SD Card Support: Up to 32GB (FAT16, FAT32)
-- 24-bit DAC output
-- 30 volume levels
-- Built-in 3W amplifier
+- Communication: UART (9600 baud default)
+- Supported formats: MP3, WAV
+- Storage: Onboard flash memory (varies by model) or SD card
+- Audio Output: Direct speaker drive or line out
+- Control: Serial commands or button interface
+- Current Consumption: ~20mA idle, ~200mA when driving speaker
 
 **Current Usage:**
 - Playing 6 audio tracks:
@@ -91,18 +97,16 @@ This document provides detailed information about each hardware component used i
   4. Access denied (first attempt)
   5. Access denied (second attempt)
   6. Access denied (multiple attempts)
-- Volume set to 10/30
 - Serial communication at 9600 baud
+- Volume control via software
 
 **Available Features Not Yet Used:**
-- Equalizer settings (Normal/Pop/Rock/Jazz/Classic/Bass)
-- Repeat and shuffle modes
-- Folder-based playback
-- Sleep mode for power saving
-- ADKey mode for button input
-- Busy pin for status detection
-- Direct speaker connection
-- SD card for data storage (creative use)
+- Busy pin for playback status
+- Button control interface
+- Folder-based organization
+- Random playback
+- Loop modes
+- EQ settings
 
 **Future Potential:**
 - Voice announcements for card holders
@@ -110,17 +114,23 @@ This document provides detailed information about each hardware component used i
 - Background music/ambience
 - Emergency alarm sounds
 - Status announcements
-- Using SD card for configuration/logging
+- Custom sound effects
 
-### 4. Relay Module (4-Channel)
+### 4. Relay Module - SRD-05VDC-SL-C (4-Channel)
 
 **Specifications:**
+- Model: SRD-05VDC-SL-C
 - Channels: 4 independent relays
 - Type: Active LOW (LOW signal = relay ON)
-- Operating Voltage: 3.3V-5V logic
-- Relay Ratings: Typically 10A @ 250VAC, 10A @ 30VDC
+- Operating Voltage: 5V relay coil, 3.3V-5V logic compatible
+- Relay Ratings: 
+  - 10A @ 250VAC
+  - 10A @ 125VAC
+  - 10A @ 30VDC
+  - 10A @ 28VDC
 - Isolation: Optocoupler isolated
 - Current per relay: ~70-80mA when active
+- Contact Form: SPDT (NO/NC/COM)
 
 **Current Usage:**
 - Relay 1: Door lock/unlock (10-second activation)
@@ -141,24 +151,48 @@ This document provides detailed information about each hardware component used i
 - Sequential activation patterns
 - Power control for other modules
 
+### 5. Power Supply - Mini360 Buck Converter
+
+**Specifications:**
+- Model: Mini360 DC-DC Buck Converter
+- Input Voltage: 4.75V-23V
+- Output Voltage: 1V-17V (adjustable)
+- Output Current: 1.8A continuous, 3A peak
+- Efficiency: Up to 96%
+- Switching Frequency: 340kHz
+- Size: Ultra-compact module
+- Protection: Over-current, thermal shutdown
+
+**Current Usage:**
+- Converting 12V automotive power to stable 5V
+- Powering all system components
+- Set to 5V output for relay module and component compatibility
+
+**Features:**
+- Adjustable output via trim pot
+- High efficiency reduces heat
+- Wide input range handles automotive voltage fluctuations
+- Compact size for easy integration
+
 ## Power Considerations
 
 ### Current Consumption Breakdown:
-- Pro Micro: ~20mA (idle)
+- ESP32-C3: ~100mA (active WiFi), ~20mA (idle), 43μA (deep sleep)
 - PN532: ~50mA (average), 150mA (peak)
-- DFPlayer: ~20mA (idle), 40mA (playing)
+- JQ6500: ~20mA (idle), 200mA (playing with speaker)
 - Relays: ~80mA per active relay
-- **Total**: ~90mA idle, ~200-300mA active
+- **Total**: ~90mA idle, ~350-450mA active
 
 ### Power Optimization Opportunities:
-1. Pro Micro sleep mode: <1mA
+1. ESP32-C3 deep sleep: 43μA
 2. PN532 power down: ~10μA
-3. DFPlayer sleep mode: <20mA
+3. JQ6500 standby mode
 4. Relay holding current reduction
+5. WiFi/BLE power management
 
 ## Expansion Possibilities
 
-### I2C Bus (Pins 2,3):
+### I2C Bus (Pins 8/9 can be configured):
 - RTC module (DS3231) for time-based access
 - OLED display for status
 - Additional EEPROM storage
@@ -167,32 +201,33 @@ This document provides detailed information about each hardware component used i
 
 ### Remaining Digital Pins:
 - Emergency button input
-- Status LEDs
+- Status LEDs (beyond built-in)
 - Buzzer for local alerts
 - PIR motion sensor
 - Door position sensor
 
-### Analog Inputs Available:
+### Analog Inputs Available (A0-A5):
 - Battery voltage monitoring
 - Light sensor for automatic brightness
 - Current sensing for each relay
 - Potentiometer for volume control
 
-### Serial/USB Options:
-- Configuration software via USB
-- Bluetooth module for wireless config
-- GPS module for location tracking
-- GSM module for remote alerts
+### Wireless Capabilities:
+- WiFi configuration portal
+- Mobile app via BLE
+- MQTT for home automation
+- ESP-NOW mesh networking
+- OTA firmware updates
 
 ## Wiring Diagram
 
 ```
-Pro Micro 3.3V 8MHz
+ESP32-C3 SuperMini
 ┌─────────────────┐
 │                 │
 │  10 ─────────── │──── PN532 SS
 │  MISO ────────── │──── PN532 MISO
-│  MOSI ────────── │──── PN532 MOSI
+│  MOSI ────────── │──── PN532 MOSI  
 │  SCK ─────────── │──── PN532 SCK
 │                 │
 │  9 ──────────── │──── Relay 1 (Door)
@@ -200,30 +235,61 @@ Pro Micro 3.3V 8MHz
 │  5 ──────────── │──── Relay 3
 │  4 ──────────── │──── Relay 4
 │                 │
-│  8 ──────────── │──── DFPlayer RX
-│  7 ──────────── │──── DFPlayer TX
+│  1 ──────────── │──── JQ6500 RX
+│  0 ──────────── │──── JQ6500 TX
 │                 │
-│  3.3V ────────── │──── Power to modules
+│  5V ─────────── │──── Mini360 Output
 │  GND ─────────── │──── Common ground
 │                 │
+└─────────────────┘
+
+Mini360 Buck Converter
+┌─────────────────┐
+│  IN+ ────────── │──── 12V Vehicle
+│  IN- ────────── │──── Vehicle GND
+│  OUT+ ───────── │──── 5V to System
+│  OUT- ───────── │──── System GND
 └─────────────────┘
 ```
 
 ## Best Practices
 
-1. **Power Supply**: Use a stable 3.3V supply with adequate current
+1. **Power Supply**: Mini360 provides stable 5V from automotive 12V
 2. **Wiring**: Keep SPI lines short for RFID reliability
 3. **Grounding**: Common ground for all components
-4. **Protection**: Add flyback diodes on relay coils
+4. **Protection**: Flyback diodes included in relay module
 5. **Shielding**: Keep RFID antenna away from metal/interference
-6. **Audio**: Use shielded cable for audio output
+6. **Audio**: JQ6500 can drive speaker directly
+
+## Advantages of New Hardware
+
+### ESP32-C3 SuperMini vs Pro Micro:
+- **Processing Power**: 160MHz RISC-V vs 8MHz AVR
+- **Memory**: 400KB RAM vs 2.5KB RAM
+- **Storage**: 4MB Flash vs 32KB Flash
+- **Wireless**: Built-in WiFi & BLE vs none
+- **Size**: Similar compact form factor
+- **Power**: More efficient deep sleep modes
+
+### JQ6500 vs DFPlayer:
+- **Simplicity**: Easier serial protocol
+- **Reliability**: More stable operation
+- **Integration**: Better documentation
+- **Cost**: Similar price point
+
+### Mini360 Buck Converter:
+- **Efficiency**: Up to 96% vs linear regulators
+- **Adjustable**: Fine-tune output voltage
+- **Compact**: Minimal board space
+- **Robust**: Handles automotive voltage spikes
 
 ## Troubleshooting Tips
 
 - RFID not reading: Check SPI connections and SS pin
-- Relays clicking rapidly: Check power supply current
-- Audio distorted: Verify DFPlayer power and SD card format
-- Random resets: Inadequate power supply or brown-out
-- Communication errors: Check baud rates and wiring
+- Relays clicking rapidly: Check 5V supply from Mini360
+- Audio issues: Verify JQ6500 serial connections
+- WiFi not connecting: Check antenna clearance
+- Random resets: Adjust Mini360 output voltage
+- BLE issues: Ensure proper power decoupling
 
-This guide will be updated as new features are implemented from the roadmap.
+This guide will be updated as new features are implemented with the ESP32-C3 platform.

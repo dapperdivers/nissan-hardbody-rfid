@@ -1,12 +1,12 @@
 # Feature: LED Status Indicators
 
 **Complexity**: 🟢 Low  
-**Hardware Required**: ✅ None (uses onboard LEDs)  
+**Hardware Required**: ✅ None (uses onboard LED)  
 **User Value**: ⭐⭐⭐ Essential
 
 ## Overview
 
-Use the Arduino Pro Micro's onboard LEDs (RX/TX and built-in LED on pin 17) to provide visual feedback about system status, card reads, and access decisions.
+Use the ESP32-C3 SuperMini's onboard blue LED (GPIO8) to provide visual feedback about system status, card reads, and access decisions. The ESP32-C3 also supports additional GPIO pins for external LEDs if needed.
 
 ## Benefits
 
@@ -24,7 +24,7 @@ Use the Arduino Pro Micro's onboard LEDs (RX/TX and built-in LED on pin 17) to p
   - [ ] `void begin()` - Initialize LED pins
   - [ ] `void setSystemReady()` - Solid LED to show system ready
   - [ ] `void setScanning()` - Blink pattern during card read
-  - [ ] `void setAccessGranted()` - Fast blink or solid green pattern
+  - [ ] `void setAccessGranted()` - Fast blink or solid pattern
   - [ ] `void setAccessDenied()` - Rapid flash pattern
   - [ ] `void setError()` - Distinct error pattern
 
@@ -38,16 +38,20 @@ Use the Arduino Pro Micro's onboard LEDs (RX/TX and built-in LED on pin 17) to p
     PATTERN_FAST_BLINK,
     PATTERN_DOUBLE_BLINK,
     PATTERN_TRIPLE_BLINK,
-    PATTERN_SOS
+    PATTERN_SOS,
+    PATTERN_BREATHING  // ESP32 PWM feature
   };
   ```
 - [ ] Implement non-blocking pattern generator using millis()
 - [ ] Add pattern queue for sequential patterns
+- [ ] Use ESP32 hardware PWM for smooth effects
 
 ### Phase 3: Status Indicators
 - [ ] **System States**:
-  - [ ] Power on: Slow fade in/out
+  - [ ] Power on: Smooth fade in/out (using PWM)
   - [ ] Ready: Slow breathing pattern
+  - [ ] WiFi connecting: Double blink pattern
+  - [ ] WiFi connected: Triple blink then solid
   - [ ] Waiting (after 10s): Double blink every 2 seconds
   - [ ] Card detected: Rapid blink
   
@@ -60,6 +64,7 @@ Use the Arduino Pro Micro's onboard LEDs (RX/TX and built-in LED on pin 17) to p
 - [ ] **Error States**:
   - [ ] RFID reader error: Continuous rapid blink
   - [ ] Audio player error: Long-short-long pattern
+  - [ ] WiFi error: Slow double blink
 
 ### Phase 4: Integration
 - [ ] Add `LEDController` instance to `main.cpp`
@@ -68,31 +73,67 @@ Use the Arduino Pro Micro's onboard LEDs (RX/TX and built-in LED on pin 17) to p
   - [ ] Card read attempts
   - [ ] Access granted/denied events
   - [ ] Error conditions
+  - [ ] WiFi/BLE status changes
 - [ ] Ensure LED patterns don't block main loop
 
 ### Phase 5: Advanced Features (Optional)
-- [ ] Use PWM for smooth fading effects
-- [ ] RGB LED support (if external RGB LED added)
+- [ ] Use ESP32 LEDC (PWM) for smooth fading
+- [ ] Multiple LED support via additional GPIOs
 - [ ] Configurable brightness levels
-- [ ] Custom pattern builder via serial commands
+- [ ] Custom pattern builder via serial/web commands
+- [ ] WS2812B addressable LED strip support
 
 ## Example Code Structure
 
 ```cpp
 class LEDController {
 public:
-    LEDController(uint8_t led_pin = LED_BUILTIN);
+    LEDController(uint8_t led_pin = 8); // GPIO8 for blue LED
     void begin();
     void update(); // Call in loop() for non-blocking patterns
     void setPattern(LEDPattern pattern);
     void playSequence(LEDPattern* patterns, uint8_t count);
+    void setBrightness(uint8_t level); // 0-255 using PWM
     
 private:
     uint8_t pin;
     LEDPattern current_pattern;
     unsigned long last_update;
     uint8_t pattern_state;
+    uint8_t brightness;
+    
+    // ESP32 PWM specific
+    uint8_t pwm_channel;
+    void setupPWM();
 };
+```
+
+## ESP32-C3 Specific Features
+
+```cpp
+// ESP32-C3 PWM LED control
+void LEDController::setupPWM() {
+    // Configure PWM functionalitites
+    ledcSetup(pwm_channel, 5000, 8); // 5kHz, 8-bit resolution
+    ledcAttachPin(pin, pwm_channel);
+}
+
+void LEDController::setBrightness(uint8_t level) {
+    ledcWrite(pwm_channel, level);
+}
+
+// Smooth breathing effect using PWM
+void LEDController::breathe() {
+    static uint8_t brightness = 0;
+    static int8_t direction = 1;
+    
+    brightness += direction;
+    if (brightness == 255 || brightness == 0) {
+        direction = -direction;
+    }
+    
+    ledcWrite(pwm_channel, brightness);
+}
 ```
 
 ## Testing Checklist
@@ -102,12 +143,16 @@ private:
 - [ ] Test pattern transitions
 - [ ] Verify correct patterns for each system state
 - [ ] Test LED visibility in different lighting conditions
+- [ ] Test PWM brightness levels
 - [ ] Measure current consumption with LEDs active
 - [ ] Test error condition indicators
+- [ ] Verify patterns work during WiFi/BLE operations
 
 ## Future Enhancements
 
-- External LED strip for more detailed status
-- Different colors for different access levels
+- External WS2812B LED strip for detailed status
+- Different colors for different access levels (RGB LED)
 - LED matrix display for card UID display
-- Light sensor for automatic brightness adjustment
+- Light sensor for automatic brightness (using ADC)
+- Synchronize LED patterns with audio feedback
+- Web interface for custom pattern configuration

@@ -18,7 +18,7 @@ This document outlines what features are currently implemented versus what's pos
 - "Are you still there?" prompt after 10 seconds
 - Access granted sound
 - Three levels of access denied sounds
-- Volume control (fixed at 10/30)
+- Volume control via JQ6500 commands
 
 #### 3. **Relay Control**  
 - 4 relay outputs (active LOW)
@@ -42,43 +42,56 @@ This document outlines what features are currently implemented versus what's pos
 
 #### 1. **Power Management**
 - Basic initialization sequence
-- No sleep modes utilized
+- No deep sleep modes utilized (43μA possible)
 - Continuous operation mode only
+- Mini360 buck converter provides stable 5V
 
 #### 2. **Configuration**
 - UIDs must be hardcoded
 - No runtime configuration
 - Test UIDs included but not production ready
+- 4MB flash storage unused
 
 #### 3. **Feedback Systems**
 - Audio only (no visual indicators)
 - No logging or history
 - Limited error reporting
+- Built-in blue LED unused
 
 ## Unused Hardware Capabilities
 
-### Pro Micro Capabilities Not Used
+### ESP32-C3 SuperMini Capabilities Not Used
 
-1. **Sleep Modes**
-   - Power-down mode (<1mA possible)
-   - Pin 7 interrupt wake-up ready
-   - USB wake capability
+1. **Wireless Connectivity**
+   - WiFi 802.11 b/g/n (2.4 GHz)
+   - Bluetooth 5.0 (BLE)
+   - ESP-NOW mesh networking
+   - OTA update capability
 
-2. **Communication**
-   - USB HID (keyboard/mouse emulation)
-   - Hardware serial port
-   - I2C bus (pins 2,3)
-   - Additional SPI devices
+2. **Power Management**
+   - Deep sleep mode (43μA)
+   - Multiple wake sources (GPIO, timer, touch)
+   - Dynamic frequency scaling
+   - WiFi/BLE power management
 
-3. **I/O Features**
-   - Built-in LEDs (RX/TX)
-   - PWM on 7 pins
-   - 9 analog inputs
-   - Internal pull-up resistors
+3. **Processing Power**
+   - 160MHz RISC-V processor (vs 8MHz AVR)
+   - 400KB SRAM (vs 2.5KB)
+   - 4MB Flash (vs 32KB)
+   - Hardware cryptography acceleration
 
-4. **Memory**
-   - 1KB EEPROM (unused)
-   - USB bootloader for easy updates
+4. **I/O Features**
+   - Built-in blue LED (GPIO8)
+   - 6 ADC channels
+   - 11 PWM channels
+   - Touch sensor capabilities
+   - RTC with calendar
+
+5. **Communication**
+   - Multiple UART interfaces
+   - I2C master/slave
+   - SPI master/slave
+   - I2S audio interface
 
 ### PN532 RFID Module Capabilities Not Used
 
@@ -100,25 +113,25 @@ This document outlines what features are currently implemented versus what's pos
    - Sector key management
    - Access control lists on card
 
-### DFPlayer Mini Capabilities Not Used
+### JQ6500 MP3 Player Capabilities Not Used
 
 1. **Audio Features**
-   - Equalizer modes
-   - Folder-based organization
-   - Repeat/shuffle playback
-   - Sleep mode
-   - Direct speaker drive
+   - Folder-based playback
+   - Random/repeat modes
+   - EQ settings
+   - Busy pin for status
+   - Button control interface
 
 2. **Control Features**
-   - Busy pin monitoring
-   - ADKey button input
-   - Serial query commands
-   - Track information retrieval
+   - Track information queries
+   - Volume memory
+   - Play specific file by name
+   - Pause/resume functionality
 
 3. **Storage Features**
-   - Up to 32GB SD card support
-   - Multiple file formats
-   - Potential for data storage
+   - SD card support (model dependent)
+   - Multiple audio formats
+   - Onboard flash variants
 
 ### Relay Module Capabilities Not Used
 
@@ -145,53 +158,70 @@ This document outlines what features are currently implemented versus what's pos
 | Power Management | None | None | ➖ Same |
 | Visual Feedback | None | None | ➖ Same |
 | Logging | None | None | ➖ Same |
+| Wireless | None | Hardware ready | 🔄 Potential |
 
 ## Quick Wins (Easy Improvements)
 
 1. **LED Status Indicators** (1-2 days)
-   - Use built-in RX/TX LEDs
+   - Use built-in blue LED (GPIO8)
    - No additional hardware needed
 
-2. **EEPROM Storage** (2-3 days)
-   - Store UIDs in EEPROM
+2. **Flash Storage** (2-3 days)
+   - Store UIDs in ESP32 flash
    - Survive power cycles
-   - 1KB available
+   - 4MB available
 
-3. **Sleep Mode** (1-2 days)
-   - Use pin 7 wake interrupt
-   - Reduce power 99%+
-   - Already wired for this
+3. **Deep Sleep Mode** (1-2 days)
+   - Ultra-low 43μA consumption
+   - Wake on GPIO or timer
+   - Dramatically extend battery life
 
-4. **Better Audio** (1 day)
-   - Use all 30 volume levels
-   - Implement equalizer modes
-   - Folder organization
+4. **WiFi Configuration Portal** (3-4 days)
+   - Web-based setup
+   - No programming needed
+   - Built-in WiFi AP mode
+
+5. **BLE Smartphone Key** (3-4 days)
+   - Use phone as RFID card
+   - Built-in Bluetooth 5.0
+   - No app needed initially
 
 ## Hardware Utilization Summary
 
-- **Pro Micro**: ~30% of capabilities used
+- **ESP32-C3**: ~20% of capabilities used
 - **PN532**: ~20% of capabilities used  
-- **DFPlayer**: ~40% of capabilities used
+- **JQ6500**: ~30% of capabilities used
 - **Relays**: 25% of channels used
+- **Power Supply**: Properly utilized
 
 ## Recommendations
 
 ### Immediate (No Hardware Needed)
-1. Implement LED feedback using built-in LEDs
-2. Add EEPROM storage for UIDs
-3. Enable sleep mode for battery operation
-4. Use more relay channels
+1. Implement blue LED feedback
+2. Add flash storage for UIDs
+3. Enable deep sleep mode (43μA)
+4. Create WiFi configuration portal
+5. Use more relay channels
 
-### Short Term (Minimal Hardware)
-1. Add emergency button on available pin
-2. Implement master card programming
-3. Add basic logging to EEPROM
-4. Battery voltage monitoring
+### Short Term (Software Only)
+1. BLE smartphone integration
+2. Web dashboard for monitoring
+3. OTA firmware updates
+4. MQTT home automation
+5. Master card programming
+
+### Medium Term (Minimal Hardware)
+1. Add emergency button
+2. Battery voltage monitoring (ADC)
+3. PIR motion sensor
+4. Temperature monitoring
+5. Solar charging support
 
 ### Long Term (Additional Hardware)
-1. RTC for time-based access
-2. SD card module for extensive logging
-3. Display for status information
-4. Wireless connectivity
+1. OLED status display
+2. Backup battery system
+3. Multiple reader support
+4. Cloud integration
+5. Voice control
 
-The current implementation is solid and improved over the original, but only scratches the surface of what's possible with the existing hardware. The modular architecture makes adding these features straightforward.
+The current implementation is solid and improved over the original, but with the ESP32-C3 platform, we're only using about 20% of the available capabilities. The wireless features alone open up enormous possibilities for remote management, smartphone integration, and home automation connectivity.
