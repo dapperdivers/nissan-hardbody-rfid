@@ -1,4 +1,5 @@
 #include <cstring>
+#include <array>
 #include "rfid_controller.h"
 
 
@@ -30,13 +31,13 @@ bool RFIDController::readCard(uint8_t* uid, uint8_t* uidLength) {
 bool RFIDController::validateUID(const uint8_t* uid, uint8_t uidLength) {
     if (uidLength == 4) {
         for (uint8_t i = 0; i < m_num4BUIDs; i++) {
-            if (compare4BUID(m_uids4B[i], uid)) {
+            if (compare4BUID(m_uids4B[i].data(), uid)) {
                 return true;
             }
         }
     } else if (uidLength == 7) {
         for (uint8_t i = 0; i < m_num7BUIDs; i++) {
-            if (compare7BUID(m_uids7B[i], uid)) {
+            if (compare7BUID(m_uids7B[i].data(), uid)) {
                 return true;
             }
         }
@@ -46,14 +47,14 @@ bool RFIDController::validateUID(const uint8_t* uid, uint8_t uidLength) {
 
 void RFIDController::addUID4B(const uint8_t* uid) {
     if (m_num4BUIDs < MAX_4B_UIDS) {
-        memcpy(m_uids4B[m_num4BUIDs], uid, 4);
+        memcpy(m_uids4B[m_num4BUIDs].data(), uid, 4);
         m_num4BUIDs++;
     }
 }
 
 void RFIDController::addUID7B(const uint8_t* uid) {
     if (m_num7BUIDs < MAX_7B_UIDS) {
-        memcpy(m_uids7B[m_num7BUIDs], uid, 7);
+        memcpy(m_uids7B[m_num7BUIDs].data(), uid, 7);
         m_num7BUIDs++;
     }
 }
@@ -73,13 +74,13 @@ void RFIDController::printFirmwareVersion() {
 
 void RFIDController::initializeDefaultUIDs() {
     // Initialize with test UIDs as specified
-    uint8_t testUID4B[] = {0xB4, 0x12, 0x34, 0x56};
-    uint8_t testUiD7B1[] = {0x04, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC};
-    uint8_t testUiD7B2[] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD};
+    std::array<uint8_t, 4> testUID4B = {0xB4, 0x12, 0x34, 0x56};
+    std::array<uint8_t, 7> testUiD7B1 = {0x04, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC};
+    std::array<uint8_t, 7> testUiD7B2 = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD};
     
-    addUID4B(testUID4B);
-    addUID7B(testUiD7B1);
-    addUID7B(testUiD7B2);
+    addUID4B(testUID4B.data());
+    addUID7B(testUiD7B1.data());
+    addUID7B(testUiD7B2.data());
 }
 
 bool RFIDController::compare4BUID(const uint8_t* uid1, const uint8_t* uid2) {

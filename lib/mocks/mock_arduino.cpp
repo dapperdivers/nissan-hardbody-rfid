@@ -1,9 +1,9 @@
 #include "mock_arduino.h"
 
 // Mock state variables
-uint8_t mockPinModes[MAX_PINS] = {0};
-uint8_t mockPinStates[MAX_PINS] = {0};
-PinStateChange mockPinHistory[MAX_PIN_HISTORY];
+std::array<uint8_t, MAX_PINS> mockPinModes{};
+std::array<uint8_t, MAX_PINS> mockPinStates{};
+std::array<PinStateChange, MAX_PIN_HISTORY> mockPinHistory{};
 uint8_t mockHistoryIndex = 0;
 millis_t mockMillis = 0;
 millis_t mock_delay_time = 0;
