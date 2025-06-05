@@ -5,37 +5,39 @@
 
 ![Simple Sexy AC System](Simple%20Sexy%20AC%20V2.png)
 
-A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built on the ESP32-C3 SuperMini platform. This project takes the original SimpleSexyAC concept and transforms it into a robust, testable, and expandable access control system with WiFi and Bluetooth capabilities.
+A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built on the ESP32-C3 SuperMini platform. This project takes the original SimpleSexyAC concept and transforms it into a robust, testable, and expandable access control system.
 
-## ✨ Key Features
+## ✨ Current Features
 
-### 🔐 **Secure Access Control**
+### 🔐 **RFID Access Control**
 
 - RFID card reading with support for 4-byte and 7-byte UIDs
+- Validates against stored authorized cards (hardcoded)
 - Brute-force protection with progressive delays (1-68 seconds)
 - 10-second door unlock on valid card presentation
 - Anti-passback protection through delay mechanism
 
 ### 🔊 **Audio Feedback System**
 
-- 6 different sound effects for various states
-- Power-up confirmation
-- "Are you still there?" prompt
-- Multiple access denied levels
-- JQ6500 MP3 player module for reliable audio
+- 6 different sound effects for various states:
+  - Power-up confirmation
+  - "Are you still there?" prompt after 10 seconds
+  - Access granted sound
+  - Three levels of access denied sounds
+- Volume control via JQ6500 MP3 player module
 
-### 📡 **Wireless Connectivity**
+### 🚪 **Relay Control**
 
-- WiFi 802.11 b/g/n for remote management
-- Bluetooth 5.0 (BLE) for mobile integration
-- OTA (Over-The-Air) update capability
-- Web-based configuration portal (future)
+- 4 relay outputs available (active LOW)
+- Relay 1 activates for 10 seconds on valid card
+- Automatic deactivation after timeout
+- Relays 2-4 available but currently unused
 
-### 🏗️ **Modern Architecture**
+### 🏗️ **Software Architecture**
 
 - **Modular OOP Design** - Clean separation of concerns
 - **Comprehensive Unit Testing** - Full test coverage with Unity framework
-- **Mock Objects** - Hardware abstraction for development
+- **Mock Objects** - Hardware abstraction for testing
 - **PlatformIO Based** - Modern embedded development workflow
 
 ## 📊 Project Status
@@ -44,12 +46,12 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 |--------|--------|---------|
 | **Core Functionality** | ✅ Complete | RFID reading, relay control, audio feedback |
 | **Code Quality** | ✅ Excellent | Modular OOP, unit tested, well-documented |
-| **Hardware Utilization** | ⚠️ 20% | Significant untapped potential (WiFi/BLE unused) |
+| **Hardware Utilization** | ⚠️ 20% | Significant untapped potential |
 | **Documentation** | ✅ Extensive | 14 feature guides + architecture docs |
 | **Power Efficiency** | ❌ Basic | Deep sleep modes not implemented |
 | **Configuration** | ❌ Hardcoded | Flash storage not utilized |
 
-## 📚 Comprehensive Documentation
+## 📚 Documentation
 
 ### Core Documentation
 
@@ -57,10 +59,10 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 - **[Hardware Guide](docs/HARDWARE_GUIDE.md)** - Detailed component specifications  
 - **[Current Features](docs/CURRENT_FEATURES.md)** - Implemented vs. possible features
 
-### Feature Enhancement Guides
+### Enhancement Guides
 
-- **[Feature Roadmap](docs/features/feature-roadmap.md)** - 14 enhancements with implementation timeline
-- **[Feature Documentation](docs/features/)** - Detailed guides for each enhancement
+- **[Feature Roadmap](docs/features/feature-roadmap.md)** - Comprehensive guide to potential enhancements
+- **[Feature Documentation](docs/features/)** - Detailed implementation guides for each enhancement
 
 ## 🚀 Quick Start
 
@@ -104,48 +106,51 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 
 | Component | Model | Current Use | Potential |
 |-----------|-------|-------------|-----------|
-| **Microcontroller** | ESP32-C3 SuperMini | Basic I/O | WiFi, BLE, deep sleep (43μA) |
-| **RFID Reader** | PN532 NFC Module | Read UIDs only | Write cards, encryption, NFC |
+| **Microcontroller** | ESP32-C3 SuperMini | Basic I/O only | WiFi, BLE, deep sleep available |
+| **RFID Reader** | PN532 NFC Module | Read UIDs only | Write cards, encryption possible |
 | **Relay Module** | 4-Channel SRD-05VDC | 1 relay (door) | 3 unused channels |
-| **Audio Module** | JQ6500 MP3 Player | 6 sound effects | Multiple folders, status |
-| **Power Supply** | Mini360 Buck Converter | 12V→5V conversion | 96% efficiency, protection |
+| **Audio Module** | JQ6500 MP3 Player | 6 sound effects | Multiple folders, status available |
+| **Power Supply** | Mini360 Buck Converter | 12V→5V conversion | Efficient, stable |
 
-## 📈 Improvement Roadmap
+## 🚧 Untapped Hardware Capabilities
 
-### 🎯 Phase 1: Zero-Cost Enhancements (1-2 weeks)
+The ESP32-C3 SuperMini has many built-in features that are not yet utilized:
 
-1. **[LED Status Indicators](docs/features/01-led-status-indicators.md)** - Use built-in blue LED
-2. **[Low Power Sleep Mode](docs/features/11-low-power-sleep-mode.md)** - 43μA deep sleep
-3. **[Master Card Programming](docs/features/06-master-card-programming.md)** - Add/remove cards without PC
-4. **[Flash Storage](docs/features/12-dfplayer-sd-persistence.md)** - Persistent settings in 4MB flash
+- **WiFi 802.11 b/g/n** - Remote management, OTA updates
+- **Bluetooth 5.0 BLE** - Smartphone as key, configuration
+- **4MB Flash Storage** - Persistent settings, logging
+- **Deep Sleep Mode** - Ultra-low 43μA power consumption
+- **Built-in Blue LED** - Status indicators
+- **Touch Sensor Support** - Alternative input methods
+- **Hardware Encryption** - Secure communications
 
-### 🔒 Phase 2: Wireless Features (1-2 weeks)
+## 📈 Potential Additions
 
-5. **[WiFi Portal](docs/features/04-remote-management.md)** - Web-based configuration
-6. **[BLE Integration](docs/features/10-mobile-app-integration.md)** - Smartphone as key
-7. **[OTA Updates](docs/features/04-remote-management.md)** - Remote firmware updates
-8. **[MQTT Support](docs/features/04-remote-management.md)** - Home automation integration
+### Zero-Cost Software Enhancements
 
-### ⚡ Phase 3: Enhanced Security (2-3 weeks)
+These enhancements require no additional hardware and can significantly improve the system:
 
-9. **[Multiple Access Levels](docs/features/02-multiple-access-levels.md)** - Role-based permissions
-10. **[Access Logging](docs/features/05-access-logging.md)** - Track all entries
-11. **[Time-Based Access](docs/features/03-time-based-access.md)** - Schedule restrictions
-12. **[Emergency Override](docs/features/08-emergency-override.md)** - Safety button
+1. **[LED Status Indicators](docs/features/01-led-status-indicators.md)** - Use built-in blue LED for visual feedback
+2. **[Low Power Sleep Mode](docs/features/11-low-power-sleep-mode.md)** - Enable 43μA deep sleep for battery operation
+3. **[Master Card Programming](docs/features/06-master-card-programming.md)** - Add/remove cards without reprogramming
+4. **[Flash Storage](docs/features/12-flash-persistence.md)** - Persistent settings using 4MB onboard flash
 
-### 📱 Phase 4: Advanced Features (3-4 weeks)
+### Additional Enhancement Categories
 
-13. **[Battery Backup](docs/features/09-battery-backup.md)** - Uninterrupted operation
-14. **[Dual Authentication](docs/features/07-dual-authentication.md)** - Two-factor security
-15. **[Scheduled Relay Control](docs/features/14-scheduled-relay-control.md)** - Automated actions
-16. **[Configurable Relay Modes](docs/features/13-configurable-relay-modes.md)** - Flexible outputs
+The [Feature Roadmap](docs/features/feature-roadmap.md) contains detailed guides for many more potential enhancements, including:
+
+- **Wireless Features** - WiFi portal, BLE integration, OTA updates, MQTT support
+- **Enhanced Security** - Multiple access levels, logging, time-based access, emergency override  
+- **Advanced Features** - Battery backup, dual authentication, scheduled relay control
+
+All enhancements are documented with implementation guides, hardware requirements, and code examples.
 
 ## 🏗️ Project Structure
 
 ```txt
 nissan-hardbody-rfid/
 ├── docs/                    # Comprehensive documentation
-│   ├── features/           # 14 enhancement guides
+│   ├── features/           # Enhancement implementation guides
 │   ├── PROJECT_OVERVIEW.md # System architecture
 │   ├── HARDWARE_GUIDE.md   # Component details
 │   └── CURRENT_FEATURES.md # Feature comparison
@@ -172,6 +177,8 @@ Currently, authorized UIDs must be hardcoded in `src/rfid_controller.cpp`:
 ```cpp
 void RFIDController::initializeDefaultUIDs() {
     // Add your UIDs here
+    std::array<uint8_t, 4> testUID4B = {0xB4, 0x12, 0x34, 0x56};
+    addUID4B(testUID4B.data());
 }
 ```
 
@@ -182,13 +189,13 @@ Future versions will support flash storage and master card programming.
 ```txt
 ESP32-C3 SuperMini ←→ Component Connections
 ├── SPI Bus ←→ PN532 RFID Module
-│   ├── Pin 10 (SS)
+│   ├── Pin 5 (SS)
 │   └── MISO/MOSI/SCK pins
 ├── Digital Outputs ←→ 4-Channel Relay
 │   ├── Pin 9 → Relay 1 (Door Lock)
-│   ├── Pin 6 → Relay 2 (Available)
-│   ├── Pin 5 → Relay 3 (Available)
-│   └── Pin 4 → Relay 4 (Available)
+│   ├── Pin 10 → Relay 2 (Available)
+│   ├── Pin 20 → Relay 3 (Available)
+│   └── Pin 21 → Relay 4 (Available)
 ├── Serial ←→ JQ6500 MP3 Player (Optional)
 │   ├── Pin 1 → JQ6500 RX
 │   └── Pin 0 → JQ6500 TX
@@ -222,6 +229,7 @@ pio test -v
 
 Contributions are welcome! Areas where help is especially appreciated:
 
+- Implementing any of the features from the roadmap
 - Testing WiFi/BLE features
 - Web dashboard development
 - Mobile app development (iOS/Android)
