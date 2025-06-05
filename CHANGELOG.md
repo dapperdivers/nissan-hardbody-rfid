@@ -41,6 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic RFID reading functionality
 - Simple relay control
 
-[Unreleased]: https://github.com/dapperdivers/nissan-hardbody-rfid/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/dapperdivers/nissan-hardbody-rfid/compare/v0.1.0...v1.0.0
-[0.1.0]: https://github.com/dapperdivers/nissan-hardbody-rfid/releases/tag/v0.1.0
+[Unreleased]: https://github.com/dapperdivers/simple-sexy/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/dapperdivers/simple-sexy/compare/v0.1.0...v1.0.0
+[0.1.0]: https://github.com/dapperdivers/simple-sexy/releases/tag/v0.1.0

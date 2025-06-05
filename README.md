@@ -1,7 +1,7 @@
 # 🚗 Nissan Hardbody RFID Access Control System
 
-[![PlatformIO CI](https://github.com/dapperdivers/nissan-hardbody-rfid/workflows/PlatformIO%20CI/badge.svg)](https://github.com/dapperdivers/nissan-hardbody-rfid/actions)
-[![codecov](https://codecov.io/gh/dapperdivers/nissan-hardbody-rfid/branch/main/graph/badge.svg)](https://codecov.io/gh/dapperdivers/nissan-hardbody-rfid)
+[![PlatformIO CI](https://github.com/dapperdivers/simple-sexy/workflows/PlatformIO%20CI/badge.svg)](https://github.com/dapperdivers/simple-sexy/actions)
+[![codecov](https://codecov.io/gh/dapperdivers/simple-sexy/branch/main/graph/badge.svg)](https://codecov.io/gh/dapperdivers/simple-sexy)
 
 ![Simple Sexy AC System](Simple%20Sexy%20AC%20V2.png)
 
@@ -78,7 +78,7 @@ A modern, modular RFID keyless entry system for the Nissan Hardbody truck, built
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/dapperdivers/nissan-hardbody-rfid.git
+   git clone https://github.com/dapperdivers/simple-sexy.git
    cd nissan-hardbody-rfid
    ```
 

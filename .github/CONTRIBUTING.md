@@ -36,7 +36,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 ## Development Setup
 
 1. Install PlatformIO Core or IDE
-2. Clone your fork: `git clone https://github.com/dapperdivers/nissan-hardbody-rfid.git`
+2. Clone your fork: `git clone https://github.com/dapperdivers/simple-sexy.git`
 3. Install dependencies: `pio lib install`
 4. Run tests: `pio test`
 
