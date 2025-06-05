@@ -12,6 +12,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Shallow clones can save time
     
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -28,22 +30,23 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pio-
     
+    - name: Install and cache apt packages
+      uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: lcov
+        version: 1.0
+    
     - name: Install PlatformIO
       run: |
         python -m pip install --upgrade pip
         pip install platformio
     
-    - name: Install coverage tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y lcov
-    
     - name: Run tests with coverage
       run: |
-        pio test -e native --verbose
+        pio test -e native
         # Generate coverage info
-        lcov --capture --directory .pio/build/native/ --output-file coverage.info
-        lcov --remove coverage.info '/usr/*' '*/test/*' '*/lib/mocks/*' '*/.pio/*' --output-file coverage.info --ignore-errors unused
+        lcov --capture --directory .pio/build/native/ --output-file coverage.info --no-external
+        lcov --remove coverage.info '*/test/*' '*/lib/mocks/*' '*/.pio/*' --output-file coverage.info --ignore-errors unused
         lcov --list coverage.info
     
     - name: Generate HTML coverage report

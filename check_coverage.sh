@@ -8,7 +8,7 @@ echo -e "\n2. Capturing coverage data..."
 lcov --capture --directory .pio/build/native/ --output-file coverage.info
 
 echo -e "\n3. Removing unwanted files from coverage..."
-lcov --remove coverage.info '/usr/*' '*/test/*' '*/lib/mocks/*' '*/.pio/*' '*/lib/test/*' --output-file coverage.info
+lcov --remove coverage.info '/usr/*' '*/test/*' '*/lib/mocks/*' '*/.pio/*' '*/lib/test/*' --output-file coverage.info --ignore-errors unused
 
 echo -e "\n4. Generating HTML report..."
 genhtml coverage.info --output-directory coverage-report
