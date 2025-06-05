@@ -100,10 +100,17 @@ Modify `.github/workflows/platformio-tests.yml` to add clang-tidy analysis. Add 
         # Create results directory
         mkdir -p clang-tidy-results
         
-        # Run clang-tidy on all source files
+        # Run clang-tidy on all source files and convert to SARIF
         find src include -name "*.cpp" -o -name "*.h" | \
-        xargs clang-tidy -p . --export-fixes=clang-tidy-results/fixes.yaml 2>&1 | \
-        tee clang-tidy-results/output.txt
+        xargs clang-tidy -p . 2>&1 | \
+        tee clang-tidy-results/output.txt | \
+        clang-tidy-sarif | \
+        tee clang-tidy-results/results.sarif | \
+        sarif-fmt
+        
+        # Also export fixes for potential auto-fixing
+        find src include -name "*.cpp" -o -name "*.h" | \
+        xargs clang-tidy -p . --export-fixes=clang-tidy-results/fixes.yaml 2>&1 > /dev/null || true
         
         # Check if there were any warnings
         if grep -q "warning:" clang-tidy-results/output.txt; then
@@ -146,6 +153,13 @@ Modify `.github/workflows/platformio-tests.yml` to add clang-tidy analysis. Add 
         name: clang-tidy-results
         path: clang-tidy-results/
         retention-days: 30
+    
+    - name: Upload SARIF to GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      if: always() && github.event_name == 'push'
+      with:
+        sarif_file: clang-tidy-results/results.sarif
+        category: clang-tidy
 ```
 
 ### 3. Create Helper Script (Optional)
@@ -199,6 +213,7 @@ Some checks are disabled for embedded/Arduino compatibility:
 3. **Performance**: Identifies optimization opportunities
 4. **Learning Tool**: Teaches modern C++ practices
 5. **CI Integration**: Runs automatically on every push
+6. **GitHub Security Integration**: Results appear in the Security tab via SARIF
 
 ## Usage
 
@@ -233,3 +248,24 @@ problematic_code(); // NOLINT(check-name)
 3. Add suppressions for false positives
 4. Consider adding more strict checks over time
 5. Integrate with IDE (VS Code has excellent clang-tidy support)
+
+## GitHub Security Integration
+
+The workflow now includes SARIF (Static Analysis Results Interchange Format) integration:
+
+1. **clang-tidy-sarif**: Converts clang-tidy output to SARIF format
+2. **sarif-fmt**: Pretty-prints SARIF for console output
+3. **GitHub Code Scanning**: Uploads SARIF to GitHub Security tab
+
+Results will appear in:
+- **Pull Requests**: Inline annotations on changed code
+- **Security Tab**: Full list of code scanning alerts
+- **Artifacts**: Downloadable reports for detailed analysis
+
+### Viewing Results
+
+After pushing code:
+1. Go to the **Security** tab in your repository
+2. Click on **Code scanning alerts**
+3. Filter by tool: `clang-tidy`
+4. Review and manage alerts

@@ -94,6 +94,21 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pio-
     
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+    
+    - name: Cache Rust dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+    
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -101,6 +116,9 @@ jobs:
         # Install clang-tidy
         sudo apt-get update
         sudo apt-get install -y clang-tidy
+        # Install clang-tidy-sarif for SARIF conversion (only if not cached)
+        which clang-tidy-sarif || cargo install clang-tidy-sarif
+        which sarif-fmt || cargo install sarif-fmt
     
     - name: Generate compile_commands.json
       run: |
@@ -114,10 +132,17 @@ jobs:
         # Create results directory
         mkdir -p clang-tidy-results
         
-        # Run clang-tidy on all source files
+        # Run clang-tidy on all source files and convert to SARIF
         find src include -name "*.cpp" -o -name "*.h" | \
-        xargs clang-tidy -p . --export-fixes=clang-tidy-results/fixes.yaml 2>&1 | \
-        tee clang-tidy-results/output.txt
+        xargs clang-tidy -p . 2>&1 | \
+        tee clang-tidy-results/output.txt | \
+        clang-tidy-sarif | \
+        tee clang-tidy-results/results.sarif | \
+        sarif-fmt
+        
+        # Also export fixes for potential auto-fixing
+        find src include -name "*.cpp" -o -name "*.h" | \
+        xargs clang-tidy -p . --export-fixes=clang-tidy-results/fixes.yaml 2>&1 > /dev/null || true
         
         # Check if there were any warnings
         if grep -q "warning:" clang-tidy-results/output.txt; then
@@ -160,3 +185,10 @@ jobs:
         name: clang-tidy-results
         path: clang-tidy-results/
         retention-days: 30
+    
+    - name: Upload SARIF to GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      if: always() && github.event_name == 'push'
+      with:
+        sarif_file: clang-tidy-results/results.sarif
+        category: clang-tidy
