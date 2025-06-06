@@ -1,3 +1,8 @@
+---
+title: Current Features
+nav_order: 4
+---
+
 # Current Features vs. Potential Capabilities
 
 This document outlines what features are currently implemented versus what's possible with the existing hardware.

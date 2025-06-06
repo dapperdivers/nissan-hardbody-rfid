@@ -1,3 +1,8 @@
+---
+title: Hardware Guide
+nav_order: 3
+---
+
 # Hardware Components Guide
 
 This document provides detailed information about each hardware component used in the Nissan Hardbody RFID system, including current usage and potential capabilities.

@@ -1,3 +1,9 @@
+---
+title: Feature Roadmap
+parent: Feature Guides
+nav_order: 20
+---
+
 # Feature Implementation Roadmap
 
 This document provides a suggested implementation order based on complexity, hardware requirements, and value to users.

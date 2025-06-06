@@ -1,3 +1,8 @@
+---
+title: Project Overview
+nav_order: 2
+---
+
 # Nissan Hardbody RFID System - Complete Project Overview
 
 ## Project Summary

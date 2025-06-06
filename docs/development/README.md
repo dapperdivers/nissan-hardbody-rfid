@@ -1,3 +1,9 @@
+---
+title: Development
+nav_order: 6
+has_children: true
+---
+
 # Development Documentation
 
 This folder contains technical documentation for developers working on the Nissan Hardbody RFID system. These documents are not intended for end users.
